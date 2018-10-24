@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>New Tab</title>
+  <link rel="stylesheet" type="text/css" href="./css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="./css/quill.bubble.css">
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+  <script src="./libraries/dom.js"></script>
+  <script src="./load-theme.js"></script>
+  <script src="./libraries/Sortable.min.js"></script>
+  <script src="./libraries/quill.min.js"></script>
+  <script src="./libraries/debounce.js"></script>
+  <!-- libraries that depend on the DOM being loaded -->
+  <script defer src="index.js"></script>
+
+  <div id="editor-container" class="hidden">
+    <div id="editor"></div>
+  </div>
+  <style id="custom-style"></style>
+  <div class="overlay hidden">
+    <div id="shortcut-dialog" class="dialog hidden">
+      <div id="shortcut-dialog-title" class="dialog-title">Edit shortcut</div>
+      <div class="input-container">
+        <label for="shortcut-name-input">Name</label>
+        <input id="shortcut-name-input" type="text" autofocus tabindex="1" aria-label="Name" data-context-menu="default">
+        <span id="shortcut-name-feedback"></span>
+      </div>
+      <div class="input-container">
+        <label for="shortcut-url-input">URL</label>
+        <input id="shortcut-url-input" type="url" tabindex="2" aria-label="URL" data-context-menu="default">
+        <span id="shortcut-url-feedback"></span>
+      </div>
+      <div class="button-group">
+        <button id="shortcut-cancel-button" class="button">Cancel</button>
+        <button id="shortcut-save-button" class="button primary">Save</button>
+      </div>
+    </div>
+    <div id="settings-dialog" class="dialog hidden">
+      <div id="settings-dialog-id" class="dialog-title">Appearance</div>
+      <div class="input-container">
+        <label for="settings-mode-input">Mode</label>
+        <select id="settings-mode-input">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <label for="settings-theme-input">Theme</label>
+        <select id="settings-theme-input" data-context-menu="default">
+          <option value="smooth-dark">Smooth Dark</option>
+          <option value="pure-light">Pure Light</option>
+          <option value="deep-black">Deep Black</option>
+          <option disabled>-</option>
+          <option value="forrest-green">Forrest Green</option>
+          <option value="material-blue">Material Blue</option>
+          <option value="savage-pink">Savage Pink</option>
+          <option value="bumblebee">Bumblebee</option>
+          <option value="persian-green">Persian Green</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <input id="settings-favicons-input" type="checkbox" />
+        <label class="inline" for="settings-favicons-input">Show Favicons</label>
+      </div>
+      <details>
+        <summary>Advanced</summary>
+        <div class="input-container">
+          <label for="settings-css-textarea">Custom CSS</label>
+          <textarea id="settings-css-textarea" tabindex="2" aria-label="CSS" data-context-menu="default"></textarea>
+          <span id="settings-css-textarea">Tweaking this might yield unexpected results.</span>
+        </div>
+      </details>
+      <div class="button-group">
+        <button id="settings-done-button" class="button primary">Done</button>
+      </div>
+    </div>
+  </div>
+  <div class="menus">
+    <div class="menu hidden">
+      <ul class="menu-options"></ul>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="bookmarks-box"></div>
+    <div class="time-box">
+      <span class="time"></span>
+      <span class="date"></span>
+      <span class="status"></span>
+    </div>
+    <div class="devices-box">
+      <div class="tabs"></div>
+    </div>
+  </div>
+</body>
+</html>

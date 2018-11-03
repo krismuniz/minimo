@@ -58,14 +58,19 @@
   --text-color: #ffffff;
 }
 
+.theme-material-red:root {
+  --background-color: #F44336;
+  --text-color: #FFFFFF;
+}
+
 .theme-material-blue:root {
   --background-color: #3367d6;
-  --text-color: #EAF1F6;
+  --text-color: #FFFFFF;
 }
 
 .theme-forrest-green:root {
   --background-color: #8BC34A;
-  --text-color: #1B5E20;
+  --text-color: #1b5e19;
   --text-weight: 300;
 }
 

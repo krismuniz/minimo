@@ -60,4 +60,11 @@ const loadAppearance = () => {
   })
 }
 
+const stats = () => {
+  if (!localStorage.getItem('installed')) {
+    localStorage.setItem('installed', Date.now())
+  }
+}
+
 loadAppearance()
+stats()

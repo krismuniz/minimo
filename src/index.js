@@ -26,6 +26,24 @@ const toggleEditor = () => {
   }
 }
 
+const toggleWelcomeDialog = () => {
+  const dismissed = localStorage.getItem('welcome-dismissed')
+
+  if (!dismissed) {
+    setTimeout(() => {
+      $('#welcome-dialog').classList.remove('hidden')
+      $('#welcome-dialog').classList.add('animate')
+    }, 1000)
+    
+  }
+
+  $('#welcome-done-button').addEventListener('click', () => {
+    $('#welcome-dialog').classList.add('hidden')
+    $('#welcome-dialog').classList.remove('animate')
+    localStorage.setItem('welcome-dismissed', Date.now())
+  })
+}
+
 const setupSettingsDialog = () => {
   const modeInput = $('#settings-mode-input')
   const themeInput = $('#settings-theme-input')
@@ -177,7 +195,7 @@ const loadSyncedTabs = () => {
 
     let currentHash = tabs.reduce((prev, curr) => {
       return prev += ':' + curr.url
-    }, '')
+    }, '') || ''
 
     // if something changed, re-render
     if (currentHash !== syncedTabsHash && tabs.length > 0) {
@@ -696,4 +714,7 @@ window.addEventListener('storage', (ev) => {
   quill.setContents(JSON.parse(ev.newValue))
 })
 
+localStorage.getItem('installed')
+
 setKeyListener()
+toggleWelcomeDialog()

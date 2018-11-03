@@ -17,7 +17,15 @@
   <script src="./libraries/debounce.js"></script>
   <!-- libraries that depend on the DOM being loaded -->
   <script defer src="index.js"></script>
-
+  <div id="welcome-dialog" class="dialog corner hidden">
+    <div id="welcome-dialog-title" class="dialog-title">👋 Welcome to Minimo!</div>
+    <p class="dialog-body">Right-click the page or a shortcut to see contextual options to customize your new tab page or toggle writing mode. </p>
+    <p class="dialog-body">If you like Minimo, don't forget to leave a review later!</p>
+    <div class="button-group no-margin">
+      <a id="welcome-help-button" class="button" target="_blank" href="https://github.com/krismuniz/minimo/#usage-guide">Help</a>
+      <button id="welcome-done-button" class="button primary">Got It</button>
+    </div>
+  </div>
   <div id="editor-container" class="hidden">
     <div id="editor"></div>
   </div>

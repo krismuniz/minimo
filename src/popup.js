@@ -107,8 +107,6 @@ const loadDeviceTabs = () => {
       if (tabs.length > 0) {
         box.appendChild(el('div.divider'))
       }
-
-      syncedTabsHash = currentHash
     }
   })
 }

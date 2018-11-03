@@ -6,8 +6,6 @@ An elegant, simplified new tab page replacement for Google Chrome.
 
 ![Minimo Screenshot](/docs/screenshot@2x.png)
 
-[[toc]]
-
 ## Installing
 
 Minimo is only available for Google Chrome on the [Chrome Webstore](https://chrome.google.com/webstore/detail/minimo/fanglmholkgdapjcfohfhnofcacjiodl) for now. 

@@ -39,6 +39,10 @@ Right-click the shortcut you want to delete and then select `Edit`. You will see
 
 Right-click the shortcut you want to delete and then select `Delete`. Your shortcut will be deleted immediately.
 
+#### Rearranging Shortcuts
+
+Drag-and-drop shortcuts to rearrange them. The order will be saved automatically and synced across all your devices via Bookmarks.
+
 #### Changing Minimo's Appearance
 
 Right-click the new tab page and click `Change appearance`. You will see a modal dialog window where you can select your preferred mode (light or dark), theme, favicon, and advanced custom style settings.

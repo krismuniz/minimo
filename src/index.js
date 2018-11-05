@@ -1,4 +1,29 @@
-const store = chrome.storage.sync
+window.browser = (function() {
+  return window.msBrowser || window.browser || window.chrome
+})()
+
+const isChrome = /chrome/i.test(navigator.userAgent)
+
+let pagePrefix
+
+if (isChrome) {
+  pagePrefix = 'chrome://'
+} else {
+  pagePrefix = 'about:'
+}
+
+let subTreeID
+if (isChrome) {
+  subTreeID = '1'
+} else {
+  subTreeID = 'unfiled_____'
+}
+
+browser.sessions.getDevices = () => {
+  return 'Not Implemented'
+}
+
+const store = browser.storage.sync
 
 const SHORTCUTS_FOLDER = 'Shortcuts'
 
@@ -34,7 +59,6 @@ const toggleWelcomeDialog = () => {
       $('#welcome-dialog').classList.remove('hidden')
       $('#welcome-dialog').classList.add('animate')
     }, 1000)
-    
   }
 
   $('#welcome-done-button').addEventListener('click', () => {
@@ -81,7 +105,7 @@ const setupSettingsDialog = () => {
       setMode(ev.target.value)
     })
   })
-  
+
   themeInput.addEventListener('change', (ev) => {
     store.set({ theme: ev.target.value }, () => {
       localStorage.setItem('theme', ev.target.value)
@@ -111,11 +135,13 @@ const setupSettingsDialog = () => {
 }
 
 const addShortcut = (title, url) => {
-  chrome.bookmarks.getSubTree('1', (tree) => {
-    let folder = tree[0].children.find(v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase())
+  browser.bookmarks.getSubTree(subTreeID, (tree) => {
+    let folder = tree[0].children.find(
+      v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase()
+    )
 
     if (folder) {
-      chrome.bookmarks.create({
+      browser.bookmarks.create({
         title,
         url,
         parentId: folder.id
@@ -123,27 +149,27 @@ const addShortcut = (title, url) => {
       return
     }
 
-    chrome.bookmarks.create({
-      title: SHORTCUTS_FOLDER,
-      parentId: '1'
-    }, () => {
-      let folder = tree[0].children.find(v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase())
-
-      chrome.bookmarks.create({
-        title,
-        url,
-        parentId: folder.id
-      })
-    })
+    browser.bookmarks.create(
+      { title: SHORTCUTS_FOLDER, parentId: subTreeID },
+      folder => {
+        browser.bookmarks.create({
+          title,
+          url,
+          parentId: folder.id
+        })
+      }
+    )
   })
 }
 
 const moveShortcut = (id, index) => {
-  chrome.bookmarks.getSubTree('1', (tree) => {
-    let folder = tree[0].children.find(v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase())
+  browser.bookmarks.getSubTree(subTreeID, (tree) => {
+    let folder = tree[0].children.find(
+      v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase()
+    )
 
     if (folder) {
-      chrome.bookmarks.move(id, {
+      browser.bookmarks.move(id, {
         parentId: folder.id,
         index
       })
@@ -153,7 +179,7 @@ const moveShortcut = (id, index) => {
 }
 
 const editShortcut = (id, title, url) => {
-  chrome.bookmarks.update(id, { title, url })
+  browser.bookmarks.update(id, { title, url })
 }
 
 const formatTime = (date) => {
@@ -167,35 +193,55 @@ const formatTime = (date) => {
 
 const refreshDate = async () => {
   const date = new Date()
-  const battery = await navigator.getBattery()
-  const connection = navigator.onLine ? '~' + navigator.connection.downlink + ' Mbps ' : 'Offline '
-  const batteryHealth = (battery.level * 100).toFixed() + '% ' + (battery.charging ? 'Charging' : 'Battery')
+  const battery =
+    (navigator.getBattery && (await navigator.getBattery())) || {}
+
+  const connection =
+    navigator.connection && navigator.onLine
+      ? '~' + navigator.connection.downlink + ' Mbps '
+      : 'Offline '
+
+  const batteryHealth =
+    (battery.level * 100).toFixed() +
+    '% ' +
+    (battery.charging ? 'Charging' : 'Battery')
 
   $('.time').textContent = formatTime(date)
-  $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
-  $('.status').textContent = connection + ' · ' + batteryHealth
+  $('.date').textContent = date.toLocaleDateString(navigator.language, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric'
+  })
+
+  if (isChrome) {
+    $('.status').textContent = connection + ' · ' + batteryHealth
+  } else {
+    let status = 'offline'
+    if (navigator.onLine) {
+      status = 'online'
+    }
+    $('.status').textContent = `You are ${status}`
+  }
 }
 
 let syncedTabsHash = ''
 
 const loadSyncedTabs = () => {
-  chrome.sessions.getDevices((devices) => {
+  browser.sessions.getDevices((devices) => {
     let tabs = devices.reduce((p, device) => {
-      return p.concat(
-        device.sessions.reduce(
-          (acc, session) => {
+        return p.concat(
+          device.sessions.reduce((acc, session) => {
             return acc.concat(
               session.window.tabs.map(tab => ({ ...tab, deviceName: device.deviceName }))
             )
           },
-          []
+          [])
         )
-      )
-    }, []).filter(t => t.url !== 'chrome://newtab/')
+      }, []).filter(t => t.url !== `${pagePrefix}newtab/`)
 
     let currentHash = tabs.reduce((prev, curr) => {
-      return prev += ':' + curr.url
-    }, '') || ''
+        return (prev += ':' + curr.url)
+      }, '') || ''
 
     // if something changed, re-render
     if (currentHash !== syncedTabsHash && tabs.length > 0) {
@@ -216,20 +262,19 @@ const loadSyncedTabs = () => {
             el(
               'img',
               {
-                src: `chrome://favicon/size/16@1x/${tab.url}`,
+                src: `${pagePrefix}favicon/size/16@1x/${tab.url}`,
                 srcset: `
-                  chrome://favicon/size/16@1x/${tab.url},
-                  chrome://favicon/size/16@2x/${tab.url} 2x
-                `
-              }
-            )
+                ${pagePrefix}favicon/size/16@1x/${tab.url},
+                ${pagePrefix}favicon/size/16@2x/${tab.url} 2x
+                `}
+              )
           ),
           tab.deviceName + ' › ' + tab.title,
           {
             href: '#',
             title: tab.title,
             click: () => {
-              chrome.sessions.restore(tab.sessionId)
+              browser.sessions.restore(tab.sessionId)
             },
             dragstart: (event) => {
               event.dataTransfer.setData('text/plain', tab.url)
@@ -248,8 +293,10 @@ const loadSyncedTabs = () => {
 }
 
 const loadBookmarks = () => {
-  chrome.bookmarks.getSubTree('1', (tree) => {
-    const folder = tree[0].children.find(v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase())
+  browser.bookmarks.getSubTree(subTreeID, tree => {
+    const folder = tree[0].children.find(
+      v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase()
+    )
 
     if (folder && folder.children.length > 0) {
       $('.bookmarks-box').innerHTML = ''
@@ -260,16 +307,13 @@ const loadBookmarks = () => {
             'a.shortcut',
             el(
               'div.favicon',
-              el(
-                'img',
-                {
-                  src: `chrome://favicon/size/16@1x/${bookmark.url}`,
-                  srcset: `
-                    chrome://favicon/size/16@1x/${bookmark.url},
-                    chrome://favicon/size/16@2x/${bookmark.url} 2x
+              el('img', {
+                src: `${pagePrefix}favicon/size/16@1x/${bookmark.url}`,
+                srcset: `
+                ${pagePrefix}favicon/size/16@1x/${bookmark.url},
+                ${pagePrefix}favicon/size/16@2x/${bookmark.url} 2x
                   `
-                }
-              )
+              })
             ),
             bookmark.title,
             {
@@ -319,10 +363,10 @@ setInterval(refreshDate, 1000)
 setInterval(loadSyncedTabs, 1000)
 
 // listen for Bookmarks events to update the view
-chrome.bookmarks.onChanged.addListener(loadBookmarks)
-chrome.bookmarks.onCreated.addListener(loadBookmarks)
-chrome.bookmarks.onRemoved.addListener(loadBookmarks)
-// chrome.bookmarks.onMoved.addListener(loadBookmarks)
+browser.bookmarks.onChanged.addListener(loadBookmarks)
+browser.bookmarks.onCreated.addListener(loadBookmarks)
+browser.bookmarks.onRemoved.addListener(loadBookmarks)
+// browser.bookmarks.onMoved.addListener(loadBookmarks)
 
 const menu = $('.menu')
 const body = $('body')
@@ -347,14 +391,10 @@ const setPosition = ({ top, left }) => {
   const bodyRect = body.getBoundingClientRect()
   const menuRect = menu.getBoundingClientRect()
 
-  const adjustedLeft = bodyRect.width - left < menuRect.width
-    ? left - menuRect.width
-    : left
+  const adjustedLeft = bodyRect.width - left < menuRect.width ? left - menuRect.width : left
 
-  const adjustedTop = bodyRect.height - top < menuRect.height
-    ? top - menuRect.height
-    : top
-  
+  const adjustedTop = bodyRect.height - top < menuRect.height ? top - menuRect.height : top
+
   menu.style.left = `${adjustedLeft}px`
   menu.style.top = `${adjustedTop}px`
   menu.classList.add('animate')
@@ -372,7 +412,13 @@ const setButtons = (buttons) => {
         break
       }
       default: {
-        menu.appendChild(el(`li.menu-option${button.disabled ? '.disabled' : ''}`, button.title, { tabindex: tabIndex.toString(), click: button.onClick }))
+        menu.appendChild(
+          el(
+            `li.menu-option${button.disabled ? '.disabled' : ''}`,
+            button.title,
+            { tabindex: tabIndex.toString(), click: button.onClick }
+          )
+        )
       }
     }
     tabIndex++
@@ -380,7 +426,14 @@ const setButtons = (buttons) => {
 }
 
 window.addEventListener('click', e => {
-  if (!menu.classList.contains('hidden') && !(e.target.classList.contains('menu-option') && e.target.classList.contains('disabled'))) {
+  if (
+    !menu.classList.contains('hidden') &&
+    e.which !== 3 &&
+    !(
+      e.target.classList.contains('menu-option') &&
+      e.target.classList.contains('disabled')
+    )
+  ) {
     toggleMenu('hide')
   }
 })
@@ -484,7 +537,7 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Open in new tab',
       onClick: () => {
-        chrome.tabs.create({
+        browser.tabs.create({
           url: e.target.href
         })
       }
@@ -492,7 +545,7 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Open in new window',
       onClick: () => {
-        chrome.windows.create({
+        browser.windows.create({
           url: e.target.href
         })
       }
@@ -500,7 +553,7 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Open in incognito window',
       onClick: () => {
-        chrome.windows.create({
+        browser.windows.create({
           url: e.target.href,
           incognito: true
         })
@@ -526,7 +579,7 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Delete',
       onClick: () => {
-        chrome.bookmarks.remove(e.target.getAttribute('data-id'))
+        browser.bookmarks.remove(e.target.getAttribute('data-id'))
       }
     },
     {
@@ -550,33 +603,36 @@ window.addEventListener('contextmenu', async e => {
       }
     }
   ]
-
-  const quickAccess = [
-    {
-      title: 'History',
-      onClick: () => {
-        chrome.tabs.create({
-          url: 'chrome://history'
-        })
+  let quickAccess = []
+  if (isChrome) {
+    quickAccess = [
+      { type: 'divider' },
+      {
+        title: 'History',
+        onClick: () => {
+          browser.tabs.create({
+            url: `${pagePrefix}history`
+          })
+        }
+      },
+      {
+        title: 'Downloads',
+        onClick: () => {
+          browser.tabs.create({
+            url: `${pagePrefix}downloads`
+          })
+        }
+      },
+      {
+        title: 'Bookmarks',
+        onClick: () => {
+          browser.tabs.create({
+            url: `${pagePrefix}bookmarks`
+          })
+        }
       }
-    },
-    {
-      title: 'Downloads',
-      onClick: () => {
-        chrome.tabs.create({
-          url: 'chrome://downloads'
-        })
-      }
-    },
-    {
-      title: 'Bookmarks',
-      onClick: () => {
-        chrome.tabs.create({
-          url: 'chrome://bookmarks'
-        })
-      }
-    }
-  ]
+    ]
+  }
 
   const addShortcutItem = {
     title: 'Add new shortcut',
@@ -630,9 +686,37 @@ window.addEventListener('contextmenu', async e => {
     }
   ]
 
+  function eventPath(evt) {
+    var path = (evt.composedPath && evt.composedPath()) || evt.path,
+      target = evt.target
+
+    if (path != null) {
+      // Safari doesn't include Window, but it should.
+      return path.indexOf(window) < 0 ? path.concat(window) : path
+    }
+
+    if (target === window) {
+      return [window]
+    }
+
+    function getParents(node, memo) {
+      memo = memo || []
+      var parentNode = node.parentNode
+
+      if (!parentNode) {
+        return memo
+      } else {
+        return getParents(parentNode, memo.concat(parentNode))
+      }
+    }
+
+    return [target].concat(getParents(target), window)
+  }
+
+  const path = eventPath(e)
   if (e.target.getAttribute('data-type') === 'shortcut') {
     buttons = buttons.concat(bookmarkActions)
-  } else if (e.path.filter(el => el.id === 'editor').length > 0) {
+  } else if (path.filter(el => el.id === 'editor').length > 0) {
     buttons = buttons.concat([
       ...switcher,
       { type: 'divider' },
@@ -641,11 +725,11 @@ window.addEventListener('contextmenu', async e => {
       ...customization
     ])
   } else {
+
     buttons = buttons.concat([
       ...switcher,
       { type: 'divider' },
       ...customization,
-      { type: 'divider' },
       ...quickAccess
     ])
   }
@@ -665,7 +749,7 @@ Sortable.create($('.bookmarks-box'), {
   animation: 150,
   dataIdAttr: 'data-sort-id',
   onEnd: (ev) => {
-    moveShortcut(ev.item.getAttribute('data-id'), ev.oldIndex < ev.newIndex ? ev.newIndex + 1 : ev.newIndex)
+    moveShortcut(ev.item.getAttribute('data-id'), ev.oldIndex < ev.newIndex ? ev.newIndex + 1 : ev.newIndex
   }
 })
 

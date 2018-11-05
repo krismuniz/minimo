@@ -1,0 +1,14 @@
+{
+  "name": "minimo",
+  "version": "1.0.6",
+  "description": "An elegant, minimal new tab page",
+  "main": "src/index.js",
+  "repository": "https://github.com/krismuniz/minimo.git",
+  "author": "krismuniz",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build-firefox": "cp manifest.firefox.json manifest.json && web-ext build --overwrite-dest --artifacts-dir=build && rm -f manifest.json",
+    "build-chrome": "cp manifest.chrome.json manifest.json && mkdir -p build && zip -r ./build/chrome-build.zip ./ -x \"*.git*\" \"*design*\" \"*docs*\" \"*design*\" \"*web-ext-artifacts*\" \"*manifest.*.json\" && rm -f manifest.json"
+  }
+}

@@ -83,3 +83,6 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+# Build folder
+build/

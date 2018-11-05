@@ -48,6 +48,7 @@ const setupSettingsDialog = () => {
   const modeInput = $('#settings-mode-input')
   const themeInput = $('#settings-theme-input')
   const faviconsInput = $('#settings-favicons-input')
+  const timeformatInput = $('#settings-timeformat-input')
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
@@ -57,6 +58,7 @@ const setupSettingsDialog = () => {
       theme: localStorage.getItem('theme') || 'smooth-dark',
       css: localStorage.getItem('css') || '',
       favicons: localStorage.getItem('favicons') || 'hide',
+      timeformat: localStorage.getItem('timeformat') || 12,
       ...settings
     }
 
@@ -71,6 +73,9 @@ const setupSettingsDialog = () => {
     if (preset.favicons === 'show') {
       $(`#settings-favicons-input`).setAttribute('checked', 'checked')
     }
+
+    $('#settings-timeformat-input option').removeAttribute('selected')
+    $(`#settings-timeformat-input option[value='${preset.timeformat}']`).setAttribute('selected', 'selected')
 
     $('#settings-css-textarea').value = preset.css
   })
@@ -100,6 +105,13 @@ const setupSettingsDialog = () => {
     store.set({ favicons: ev.target.checked ? 'show' : 'hide' }, () => {
       localStorage.setItem('favicons', ev.target.checked ? 'show' : 'hide')
       setFavicons(ev.target.checked ? 'show' : 'hide')
+    })
+  })
+
+  timeformatInput.addEventListener('change', (ev) => {
+    store.set({ timeformat: ev.target.value }, () => {
+      localStorage.setItem('timeformat', ev.target.value)
+      refreshDate()
     })
   })
 
@@ -157,9 +169,12 @@ const editShortcut = (id, title, url) => {
 }
 
 const formatTime = (date) => {
+  const timeformat = localStorage.getItem('timeformat') || '12'
   const h = date.getHours()
   const m = date.getMinutes()
-  const hours = h === 0 || h === 12 ? '12' : h % 12
+  const hours = timeformat === '12'
+    ? h === 0 || h === 12 ? '12' : h % 12
+    : h
   const minutes = m < 10 ? '0' + m : m
 
   return `${hours}:${minutes}`

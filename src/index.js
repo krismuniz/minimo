@@ -58,7 +58,7 @@ const setupSettingsDialog = () => {
       theme: localStorage.getItem('theme') || 'smooth-dark',
       css: localStorage.getItem('css') || '',
       favicons: localStorage.getItem('favicons') || 'hide',
-      timeformat: localStorage.getItem('timeformat') || 12,
+      timeformat: localStorage.getItem('timeformat') || '12',
       ...settings
     }
 

@@ -48,6 +48,7 @@ const setupSettingsDialog = () => {
   const modeInput = $('#settings-mode-input')
   const themeInput = $('#settings-theme-input')
   const faviconsInput = $('#settings-favicons-input')
+  const batteryInput = $('#settings-battery-input')
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
@@ -57,6 +58,7 @@ const setupSettingsDialog = () => {
       theme: localStorage.getItem('theme') || 'smooth-dark',
       css: localStorage.getItem('css') || '',
       favicons: localStorage.getItem('favicons') || 'hide',
+      battery: localStorage.getItem('battery') || 'show',
       ...settings
     }
 
@@ -70,6 +72,11 @@ const setupSettingsDialog = () => {
     $('#settings-favicons-input').removeAttribute('checked')
     if (preset.favicons === 'show') {
       $(`#settings-favicons-input`).setAttribute('checked', 'checked')
+    }
+
+    $('#settings-battery-input').removeAttribute('checked')
+    if (preset.battery === 'show') {
+      $(`#settings-battery-input`).setAttribute('checked', 'checked')
     }
 
     $('#settings-css-textarea').value = preset.css
@@ -100,6 +107,12 @@ const setupSettingsDialog = () => {
     store.set({ favicons: ev.target.checked ? 'show' : 'hide' }, () => {
       localStorage.setItem('favicons', ev.target.checked ? 'show' : 'hide')
       setFavicons(ev.target.checked ? 'show' : 'hide')
+    })
+  })
+
+  batteryInput.addEventListener('change', (ev) => {
+    store.set({ battery: ev.target.checked ? 'show' : 'hide' }, () => {
+      localStorage.setItem('battery', ev.target.checked ? 'show' : 'hide')
     })
   })
 
@@ -167,13 +180,19 @@ const formatTime = (date) => {
 
 const refreshDate = async () => {
   const date = new Date()
-  const battery = await navigator.getBattery()
   const connection = navigator.onLine ? '~' + navigator.connection.downlink + ' Mbps ' : 'Offline '
-  const batteryHealth = (battery.level * 100).toFixed() + '% ' + (battery.charging ? 'Charging' : 'Battery')
-
+  
   $('.time').textContent = formatTime(date)
   $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
-  $('.status').textContent = connection + ' · ' + batteryHealth
+  let status = connection;
+
+  if (localStorage.getItem('battery') == 'show') {
+    const battery = await navigator.getBattery()
+    const batteryHealth = (battery.level * 100).toFixed() + '% ' + (battery.charging ? 'Charging' : 'Battery')
+    status +=  ' · ' + batteryHealth
+  }
+
+  $('.status').textContent = status
 }
 
 let syncedTabsHash = ''

@@ -38,15 +38,19 @@ const loadAppearance = () => {
   let mode = localStorage.getItem('mode') || 'dark'
   let theme = localStorage.getItem('theme') || 'smooth-dark'
   let favicons = localStorage.getItem('favicons') || 'hide'
+  let timeformat = localStorage.getItem('timeformat') || '12h'
+  let battery = localStorage.getItem('battery') || 'show'
   let css = localStorage.getItem('css') || ''
 
-  setAppearance({ mode, theme, favicons, css })
+  setAppearance({ mode, theme, favicons, timeformat, battery, css })
 
-  chrome.storage.sync.get(['theme', 'mode', 'css'], (settings) => {
+  chrome.storage.sync.get(['theme', 'mode', 'favicons', 'timeformat', 'battery', 'css'], (settings) => {
     let preset = {
       mode,
       theme,
       favicons,
+      timeformat,
+      battery,
       css,
       ...settings
     }
@@ -54,9 +58,18 @@ const loadAppearance = () => {
     localStorage.setItem('mode', preset.mode)
     localStorage.setItem('theme', preset.theme)
     localStorage.setItem('favicons', preset.favicons)
+    localStorage.setItem('timeformat', preset.timeformat)
+    localStorage.setItem('battery', preset.battery)
     localStorage.setItem('css', preset.css)
 
-    setAppearance({ mode: preset.mode, theme: preset.theme, favicons: preset.favicons, css: preset.css })
+    setAppearance({
+      mode: preset.mode,
+      theme: preset.theme,
+      favicons: preset.favicons,
+      timeformat: preset.timeformat,
+      battery: preset.battery,
+      css: preset.css
+    })
   })
 }
 

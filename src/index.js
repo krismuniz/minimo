@@ -52,7 +52,7 @@ const setupSettingsDialog = () => {
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
-  store.get(['theme', 'mode', 'css'], (settings) => {
+  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat'], (settings) => {
     let preset = {
       mode: localStorage.getItem('mode') || 'dark',
       theme: localStorage.getItem('theme') || 'smooth-dark',
@@ -86,7 +86,7 @@ const setupSettingsDialog = () => {
       setMode(ev.target.value)
     })
   })
-  
+
   themeInput.addEventListener('change', (ev) => {
     store.set({ theme: ev.target.value }, () => {
       localStorage.setItem('theme', ev.target.value)

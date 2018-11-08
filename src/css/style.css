@@ -440,6 +440,11 @@ a:not(.button):visited {
   margin-bottom: 1rem;
 }
 
+.input-container.inline {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
 .input-container span {
   color: #ff8d5e;
   display: block;

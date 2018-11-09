@@ -309,6 +309,14 @@ const loadBookmarks = () => {
             {
               href: bookmark.url,
               title: bookmark.title,
+              click: () => {
+                // update current tab location with bookmark.url
+                // in case a normal navigation event can't occur
+                // e.g. opening chrome:// links
+                chrome.tabs.getCurrent((tab) => {
+                  chrome.tabs.update(tab.id, { url: bookmark.url })
+                })
+              },
               'data-icon': bookmark.favicon,
               'data-id': bookmark.id,
               'data-type': 'shortcut'

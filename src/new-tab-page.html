@@ -14,6 +14,7 @@
   <script src="./load-theme.js"></script>
   <script src="./libraries/Sortable.min.js"></script>
   <script src="./libraries/quill.min.js"></script>
+  <script src="./libraries/modikeys.js"></script>
   <script src="./libraries/debounce.js"></script>
   <!-- libraries that depend on the DOM being loaded -->
   <script defer src="index.js"></script>
@@ -73,13 +74,6 @@
           <option disabled>Custom Theme (coming soon)</option>
         </select>
       </div>
-      <div class="input-container">
-        <label for="settings-timeformat-input">Time format</label>
-        <select id="settings-timeformat-input">
-          <option value="12">12h</option>
-          <option value="24">24h</option>
-        </select>
-      </div>
       <div class="input-container inline">
         <input id="settings-favicons-input" type="checkbox" />
         <label class="inline" for="settings-favicons-input">Show Favicons</label>
@@ -89,11 +83,24 @@
         <label class="inline" for="settings-battery-input">Show Battery</label>
       </div>
       <details>
-        <summary>Advanced</summary>
+        <summary>Advanced Settings</summary>
+        <div class="input-container">
+          <label for="settings-timeformat-input">Time format</label>
+          <select id="settings-timeformat-input">
+            <option value="12">12h</option>
+            <option value="24">24h</option>
+          </select>
+        </div>
+        <div class="input-container">
+          <label for="settings-writing-mode-shortcut-input">Writing Mode Keyboard Shortcut</label>
+          <input id="settings-writing-mode-shortcut-input" data-shortcut-listener="true" type="text" />
+          <span id="settings-writing-mode-shortcut-info" class="info">Type-in a key combination to that will toggle writing mode.</span>
+          <span id="settings-writing-mode-shortcut-info-2" class="info">It must include a modifier key (alt, shift, control, etc.)</span>
+        </div>
         <div class="input-container">
           <label for="settings-css-textarea">Custom CSS</label>
           <textarea id="settings-css-textarea" tabindex="2" aria-label="CSS" data-context-menu="default"></textarea>
-          <span id="settings-css-textarea">Tweaking this might yield unexpected results.</span>
+          <span id="settings-css-info" class="info">Tweaking this might yield unexpected results.</span>
         </div>
       </details>
       <div class="button-group">

@@ -1,6 +1,7 @@
 const store = chrome.storage.sync
 
 const SHORTCUTS_FOLDER = 'Shortcuts'
+const IS_MAC = window.navigator.platform.indexOf('Mac') !== -1
 
 const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g class="nc-icon-wrapper" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" transform="translate(0.5 0.5)" stroke="currentColor"><path fill="none" stroke="currentColor" stroke-miterlimit="10" d="M10,23H3 c-1.105,0-2-0.895-2-2V3c0-1.105,0.895-2,2-2h12c1.105,0,2,0.895,2,2v7"/> <circle data-stroke="none" cx="9" cy="18" r="1" stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M14.126,17 c0.444-1.725,2.01-3,3.874-3c1.48,0,2.772,0.804,3.464,1.999"/> <polygon data-color="color-2" data-stroke="none" points="23.22,13.649 22.792,18 18.522,17.061 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M21.874,20 c-0.444,1.725-2.01,3-3.874,3c-1.48,0-2.772-0.804-3.464-1.999"/> <polygon data-color="color-2" data-stroke="none" points="12.78,23.351 13.208,19 17.478,19.939 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/></g></svg>'
 
@@ -34,7 +35,6 @@ const toggleWelcomeDialog = () => {
       $('#welcome-dialog').classList.remove('hidden')
       $('#welcome-dialog').classList.add('animate')
     }, 1000)
-    
   }
 
   $('#welcome-done-button').addEventListener('click', () => {
@@ -53,6 +53,9 @@ const setupSettingsDialog = () => {
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
+  // keyboard shortcut overrides
+  const writingModeShortcutInput = $('#settings-writing-mode-shortcut-input')
+
   store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery'], (settings) => {
     let preset = {
       mode: localStorage.getItem('mode') || 'dark',
@@ -61,6 +64,7 @@ const setupSettingsDialog = () => {
       favicons: localStorage.getItem('favicons') || 'hide',
       timeformat: localStorage.getItem('timeformat') || '12',
       battery: localStorage.getItem('battery') || 'show',
+      writingModeShortcut: localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+⌘' : 'ctrl+shift'),
       ...settings
     }
 
@@ -84,6 +88,7 @@ const setupSettingsDialog = () => {
       $(`#settings-battery-input`).setAttribute('checked', 'checked')
     }
 
+    $('#settings-writing-mode-shortcut-input').value = preset.writingModeShortcut
     $('#settings-css-textarea').value = preset.css
   })
 
@@ -100,6 +105,13 @@ const setupSettingsDialog = () => {
       setTheme(ev.target.value)
     })
   })
+
+  writingModeShortcutInput.addEventListener('keydown', modikeys(
+    (shortcut, event) => {
+      localStorage.setItem('writing-mode-shortcut', shortcut)
+      event.target.value = shortcut
+    }
+  ))
 
   cssTextarea.addEventListener('change', (ev) => {
     store.set({ css: ev.target.value }, () => {
@@ -729,20 +741,23 @@ const quill = new Quill('#editor', {
 })
 
 const setKeyListener = () => {
-  let lastPress = 0
-  let delta = 300
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Meta' || e.key === 'Shift') {
-      if (Date.now() - lastPress <= delta) {
-        toggleEditor()
-        e.preventDefault()
-        lastPress = 0
-      } else {
-        lastPress = Date.now()
+  const shortcutListener = modikeys(
+    (combo, event) => {
+      if (event.target.getAttribute('data-shortcut-listener') !== 'true') {
+        switch (combo) {
+          case localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+⌘' : 'ctrl+shift'):
+            event.preventDefault()
+            toggleEditor()
+            break
+          default:
+            return true
+        }
       }
-    }
-  })
+    },
+    { preventDefault: false }
+  )
+
+  window.addEventListener('keydown', shortcutListener)
 }
 
 function handleEditorChange (ch) {

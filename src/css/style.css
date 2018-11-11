@@ -446,9 +446,17 @@ a:not(.button):visited {
 }
 
 .input-container span {
-  color: #ff8d5e;
   display: block;
   margin-top: 0.25rem;
+}
+
+.input-container span.info {
+  opacity: 0.65;
+  margin-top: 0.5rem;
+}
+
+.input-container span:not(.info) {
+  color: #ff8d5e;
 }
 
 .input-container input:not([type="checkbox"]), .input-container select, .input-container textarea {
@@ -499,9 +507,16 @@ a:not(.button):visited {
   display: inline;
 }
 
+details[open] summary {
+  opacity: 0.75;
+}
+
 summary {
   margin-bottom: 1rem;
   outline: none;
+  font-size: 0.875rem;
+  font-weight: 400;
+  cursor: pointer;
 }
 
 @media print {

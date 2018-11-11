@@ -45,11 +45,11 @@ Drag-and-drop shortcuts to rearrange them. The order will be saved automatically
 
 #### Changing Minimo's Appearance
 
-Right-click the new tab page and click `Change appearance`. You will see a modal dialog window where you can select your preferred mode (light or dark), theme, favicon, and advanced custom style settings.
+Right-click the new tab page and click `Change appearance`. You will see a modal dialog window where you can select your preferred mode (light or dark), theme, favicon, and advanced settings such as time format (12hr or 24hr), keyboard shortcuts, and custom CSS style.
 
 #### Toggle Writing Mode On/Off
 
-Right-click the new tab page and click `Exit writing mode` or `Enter writing mode` or double press the `⌘` key (`ctrl` in Windows).
+Right-click the new tab page and click `Exit writing mode` or `Enter writing mode`. Alternatively, you can use the default keyboard shortcut `shift+⌘` keys (`ctrl+shift` in Windows) or change it in `Change Appearance...` > `Advanced Settings` > `Writing Mode Keyboard Shortcut`
 
 ## Privacy
 

@@ -2,6 +2,8 @@ const store = chrome.storage.sync
 
 const SHORTCUTS_FOLDER = 'Shortcuts'
 const IS_MAC = window.navigator.platform.indexOf('Mac') !== -1
+const today = new Date()
+let festive = false
 
 const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g class="nc-icon-wrapper" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" transform="translate(0.5 0.5)" stroke="currentColor"><path fill="none" stroke="currentColor" stroke-miterlimit="10" d="M10,23H3 c-1.105,0-2-0.895-2-2V3c0-1.105,0.895-2,2-2h12c1.105,0,2,0.895,2,2v7"/> <circle data-stroke="none" cx="9" cy="18" r="1" stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M14.126,17 c0.444-1.725,2.01-3,3.874-3c1.48,0,2.772,0.804,3.464,1.999"/> <polygon data-color="color-2" data-stroke="none" points="23.22,13.649 22.792,18 18.522,17.061 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M21.874,20 c-0.444,1.725-2.01,3-3.874,3c-1.48,0-2.772-0.804-3.464-1.999"/> <polygon data-color="color-2" data-stroke="none" points="12.78,23.351 13.208,19 17.478,19.939 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/></g></svg>'
 
@@ -207,7 +209,10 @@ const formatTime = (date) => {
 
 const refreshDate = async () => {
   const date = new Date()
-  const connection = navigator.onLine ? '~' + navigator.connection.downlink + ' Mbps' : 'Offline'
+  const speed = navigator.connection.downlink
+  const connection = navigator.onLine
+    ? (speed === 10 ? '> ' + speed : '~' + speed) + ' Mbps'
+    : 'Offline'
   
   $('.time').textContent = formatTime(date)
   $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
@@ -775,3 +780,123 @@ localStorage.getItem('installed')
 
 setKeyListener()
 toggleWelcomeDialog()
+
+/**
+ * Let It Snow, Sometimes.
+ * Special thanks to Paul Lewis (@aerotwist)
+ */
+
+function randBetween (min, max) {
+  return min + Math.random() * (max - min)
+}
+
+class Snowflake {
+  constructor () {
+    this.x = 0
+    this.y = 0
+    this.vx = 0
+    this.vy = 0
+    this.radius = 0
+    this.velocity = 0
+    this.alpha = 0
+
+    this.reset()
+  }
+
+  reset () {
+    this.x = randBetween(0, window.innerWidth)
+    this.y = randBetween(0, -window.innerHeight)
+    this.vx = randBetween(-3, 3)
+    this.vy = randBetween(2, 3)
+    this.radius = randBetween(1, 4)
+    this.alpha = randBetween(0.1, 0.9)
+  }
+
+  update () {
+    this.x += this.vx
+    this.y += this.vy
+
+    if (this.y + this.radius > window.innerHeight) {
+      this.reset()
+    }
+  }
+}
+
+class Snow {
+  constructor () {
+    this.canvas = document.createElement('canvas')
+    this.container = el('div#holiday-canvas.snow', this.canvas)
+    this.ctx = this.canvas.getContext('2d')
+    this.updateBound = this.update.bind(this)
+    
+    document.body.appendChild(this.container)
+
+    $('#settings-css-info').innerHTML = `To stop the snow, add <code>.snow { display: none; }</code>`
+    window.addEventListener('resize', () => this.onResize())
+
+    this.onResize()
+    this.createSnowFlakes()
+    requestAnimationFrame(this.updateBound)
+  }
+  
+  onResize () {
+    this.width = window.innerWidth
+    this.height = window.innerHeight
+    this.canvas.width = this.width
+    this.canvas.height = this.height
+  }
+  
+  createSnowFlakes () {
+    const flakes = window.innerWidth / 4
+    this.snowflakes = []
+
+    for (let i = 0; i < flakes; i++) {
+      this.snowflakes.push(new Snowflake())
+    }
+  }
+  
+  update () {
+    this.ctx.clearRect(0, 0, this.width, this.height)
+
+    for (let flake of this.snowflakes) {
+      flake.update()
+
+      this.ctx.save()
+      this.ctx.fillStyle = '#FFF'
+      this.ctx.beginPath()
+      this.ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2)
+      this.ctx.closePath()
+      this.ctx.globalAlpha = flake.alpha
+      this.ctx.fill()
+      this.ctx.restore()
+    }
+
+    requestAnimationFrame(this.updateBound)
+  }
+}
+
+const snowDays = [
+  {
+    month: 12,
+    day: 24 // Christmas Eve
+  },
+  {
+    month: 12,
+    day: 25 // Christmas Day
+  },
+  {
+    month: 12, 
+    day: 31 // New Year's Eve
+  },
+  {
+    month: 1, 
+    day: 1 // New Year's Day
+  }
+]
+
+for (let day of snowDays) {
+  if (today.getDate() === day.day && today.getMonth() + 1 === day.month && festive === false) {
+    festive = true
+    new Snow()
+  }
+}

@@ -2,6 +2,16 @@
 
 All notable changes to Minimo will be documented in this file.
 
+##  1.1.1 – 2018-12-09
+
+### Features Added
+
+- ❄️❄️❄️
+
+### Bugs Fixed
+
+- Fixed typo in keyboard shortcut input helper
+
 ##  1.1.0 – 2018-11-10
 
 ### Features Added

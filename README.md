@@ -73,6 +73,6 @@ Make sure that a pull request solving your specific problem does not exist alrea
 
 ## License
 
-[The MIT License (MIT)](https://github.com/krismuniz/vott-messenger/blob/master/LICENSE.md)
+[The MIT License (MIT)](https://github.com/krismuniz/minimo/blob/master/LICENSE.md)
 
 Copyright (c) 2018 [Kristian Muñiz](https://www.krismuniz.com)

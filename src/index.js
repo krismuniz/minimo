@@ -3,7 +3,8 @@ const store = chrome.storage.sync
 const SHORTCUTS_FOLDER = 'Shortcuts'
 const IS_MAC = window.navigator.platform.indexOf('Mac') !== -1
 const today = new Date()
-let festive = false
+let holiday = false
+let specialMessage = false
 
 const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g class="nc-icon-wrapper" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" transform="translate(0.5 0.5)" stroke="currentColor"><path fill="none" stroke="currentColor" stroke-miterlimit="10" d="M10,23H3 c-1.105,0-2-0.895-2-2V3c0-1.105,0.895-2,2-2h12c1.105,0,2,0.895,2,2v7"/> <circle data-stroke="none" cx="9" cy="18" r="1" stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M14.126,17 c0.444-1.725,2.01-3,3.874-3c1.48,0,2.772,0.804,3.464,1.999"/> <polygon data-color="color-2" data-stroke="none" points="23.22,13.649 22.792,18 18.522,17.061 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M21.874,20 c-0.444,1.725-2.01,3-3.874,3c-1.48,0-2.772-0.804-3.464-1.999"/> <polygon data-color="color-2" data-stroke="none" points="12.78,23.351 13.208,19 17.478,19.939 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/></g></svg>'
 
@@ -224,7 +225,15 @@ const refreshDate = async () => {
     status +=  ' · ' + batteryHealth
   }
 
+  const message = typeof specialMessage === 'function' ? specialMessage({ date }) : specialMessage
+
   $('.status').textContent = status
+  $('.special-message').textContent = (specialMessage && message ? message : '')
+  if (!message) {
+    $('.special-message').classList.add('hidden')
+  } else {
+    $('.special-message').classList.remove('hidden')
+  }
 }
 
 let syncedTabsHash = ''
@@ -791,7 +800,7 @@ function randBetween (min, max) {
 }
 
 class Snowflake {
-  constructor () {
+  constructor ({ colors }) {
     this.x = 0
     this.y = 0
     this.vx = 0
@@ -799,6 +808,7 @@ class Snowflake {
     this.radius = 0
     this.velocity = 0
     this.alpha = 0
+    this.availableColors = colors
 
     this.reset()
   }
@@ -810,6 +820,11 @@ class Snowflake {
     this.vy = randBetween(2, 3)
     this.radius = randBetween(1, 4)
     this.alpha = randBetween(0.1, 0.9)
+    this.color = this.availableColors[
+      Math.round(
+        randBetween(0, this.availableColors.length - 1)
+      )
+    ]
   }
 
   update () {
@@ -823,15 +838,16 @@ class Snowflake {
 }
 
 class Snow {
-  constructor () {
+  constructor ({ colors }) {
     this.canvas = document.createElement('canvas')
-    this.container = el('div#holiday-canvas.snow', this.canvas)
+    this.container = el('div#holiday-canvas.holidays', this.canvas)
     this.ctx = this.canvas.getContext('2d')
     this.updateBound = this.update.bind(this)
-    
+    this.colors = colors
+
     document.body.appendChild(this.container)
 
-    $('#settings-css-info').innerHTML = `To stop the snow, add <code>.snow { display: none; }</code>`
+    $('#settings-css-info').innerHTML = `To stop the snow, add <code>.holidays { display: none; }</code>`
     window.addEventListener('resize', () => this.onResize())
 
     this.onResize()
@@ -845,13 +861,22 @@ class Snow {
     this.canvas.width = this.width
     this.canvas.height = this.height
   }
-  
+
+  changeColors (colors) {
+    this.colors = colors
+    this.createSnowFlakes()
+  }
+
   createSnowFlakes () {
     const flakes = window.innerWidth / 4
     this.snowflakes = []
 
     for (let i = 0; i < flakes; i++) {
-      this.snowflakes.push(new Snowflake())
+      this.snowflakes.push(
+        new Snowflake({
+          colors: this.colors
+        })
+      )
     }
   }
   
@@ -862,7 +887,7 @@ class Snow {
       flake.update()
 
       this.ctx.save()
-      this.ctx.fillStyle = '#FFF'
+      this.ctx.fillStyle = flake.color || '#FFFFFF'
       this.ctx.beginPath()
       this.ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2)
       this.ctx.closePath()
@@ -877,26 +902,70 @@ class Snow {
 
 const snowDays = [
   {
+    message: 'Happy Holidays!',
+    colors: ['#FFFFFF'],
     month: 12,
     day: 24 // Christmas Eve
   },
   {
+    message: 'Happy Holidays!',
+    colors: [
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#FFFFFF',
+      '#EF2D56',
+      '#0CCE6B'
+    ],
     month: 12,
     day: 25 // Christmas Day
   },
   {
+    message: ({ date }) => {
+      const nextYear = date.getFullYear() + 1
+      const h = date.getHours()
+      const m = date.getMinutes()
+      const s = date.getSeconds()
+
+      const hrs = 24 - h - 1
+      const min = 60 - m - 1
+      const sec = 60 - s - 1
+
+      return hrs <= 5
+        ? (hrs === 0 && min === 0 ? `${sec}s` : `${hrs}h ${min}m ${sec}s to New Year ${nextYear}`)
+        : ''
+    },
+    colors: ['#FFFFFF'],
     month: 12, 
     day: 31 // New Year's Eve
   },
   {
+    message: 'Happy New Year!',
+    colors: [
+      '#0CCE6B',
+      '#DCED31',
+      '#EF2D56',
+      '#ED7D3A'
+    ],
     month: 1, 
     day: 1 // New Year's Day
   }
 ]
 
 for (let day of snowDays) {
-  if (today.getDate() === day.day && today.getMonth() + 1 === day.month && festive === false) {
-    festive = true
-    new Snow()
+  if (today.getDate() === day.day && today.getMonth() + 1 === day.month && holiday === false) {
+    holiday = new Snow({
+      colors: day.colors || ['#FFFFFF']
+    })
+    if (day.message) specialMessage = day.message 
   }
 }

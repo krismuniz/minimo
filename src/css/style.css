@@ -160,6 +160,7 @@ a:not(.button):visited {
   background: white;
   border-radius: 1rem;
   vertical-align: bottom;
+  overflow: hidden;
 }
 
 .favicon img {
@@ -199,13 +200,21 @@ a:not(.button):visited {
   font-weight: 100;
 }
 
-.status {
+.status, .special-message {
   display: block;
   font-size: 1rem;
   font-weight: 100;
   margin: 1rem;
   color: var(--text-color);
   opacity: 0.75;
+}
+
+.special-message {
+  font-weight: 400;
+}
+
+.special-message.hidden {
+  display: none;
 }
 
 .date {

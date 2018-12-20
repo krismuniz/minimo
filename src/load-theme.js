@@ -38,7 +38,7 @@ const loadAppearance = () => {
   let mode = localStorage.getItem('mode') || 'dark'
   let theme = localStorage.getItem('theme') || 'smooth-dark'
   let favicons = localStorage.getItem('favicons') || 'hide'
-  let timeformat = localStorage.getItem('timeformat') || '12h'
+  let timeformat = localStorage.getItem('timeformat') || '12'
   let battery = localStorage.getItem('battery') || 'show'
   let css = localStorage.getItem('css') || ''
 

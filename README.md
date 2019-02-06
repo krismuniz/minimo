@@ -71,6 +71,15 @@ Pull Requests (PRs) are welcome! You should follow the [same basic stylistic con
 
 Make sure that a pull request solving your specific problem does not exist already. Your changes must be concise and focus on solving a discrete problem.
 
+## Known issues
+
+### Color tearing
+
+If you encounter any color tearing issues with your Minimo start screen then you need to force the sRGB color profile in Chrome.
+
+To do this, enter the following URL into your browser and switch the option to `sRGB`:
+`chrome://flags#force-color-profile`
+
 ## License
 
 [The MIT License (MIT)](https://github.com/krismuniz/minimo/blob/master/LICENSE.md)

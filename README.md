@@ -8,7 +8,7 @@ An elegant, simplified new tab page replacement for Google Chrome.
 
 ## Installing
 
-Minimo is only available for [Google Chrome](https://chrome.google.com) and [Brave](https://bravebrowser.com) on the [Chrome Webstore](https://chrome.google.com/webstore/detail/minimo/fanglmholkgdapjcfohfhnofcacjiodl) for now. 
+Minimo is only available for [Google Chrome](https://chrome.google.com) and [Brave](https://brave.com) on the [Chrome Webstore](https://chrome.google.com/webstore/detail/minimo/fanglmholkgdapjcfohfhnofcacjiodl) for now. 
 
 Do you want minimo to support other browser? [Let us know!](https://github.com/krismuniz/minimo/issues/new)
 

@@ -335,7 +335,8 @@ const loadBookmarks = () => {
             {
               href: bookmark.url,
               title: bookmark.title,
-              click: () => {
+              click: (e) => {
+                if (e.metaKey === true || e.ctrlKey === true) return false
                 // update current tab location with bookmark.url
                 // in case a normal navigation event can't occur
                 // e.g. opening chrome:// links

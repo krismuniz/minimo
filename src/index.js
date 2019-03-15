@@ -549,12 +549,16 @@ window.addEventListener('contextmenu', async e => {
 
   let buttons = []
 
+  const shortcutTarget = e.path.find((element) => {
+    return (element && element.getAttribute) && element.getAttribute('data-type') && element.getAttribute('data-id')
+  })
+
   const bookmarkActions = [
     {
       title: 'Open in new tab',
       onClick: () => {
         chrome.tabs.create({
-          url: e.target.href
+          url: shortcutTarget.href
         })
       }
     },
@@ -562,7 +566,7 @@ window.addEventListener('contextmenu', async e => {
       title: 'Open in new window',
       onClick: () => {
         chrome.windows.create({
-          url: e.target.href
+          url: shortcutTarget.href
         })
       }
     },
@@ -570,7 +574,7 @@ window.addEventListener('contextmenu', async e => {
       title: 'Open in incognito window',
       onClick: () => {
         chrome.windows.create({
-          url: e.target.href,
+          url: shortcutTarget.href,
           incognito: true
         })
       }
@@ -581,21 +585,21 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Edit',
       onClick: () => {
-        shortcutPrompt(e.target.title, e.target.href, 'edit', ({ title, url}) => {
-          editShortcut(e.target.getAttribute('data-id'), title, url)
+        shortcutPrompt(shortcutTarget.title, shortcutTarget.href, 'edit', ({ title, url}) => {
+          editShortcut(shortcutTarget.getAttribute('data-id'), title, url)
         })
       }
     },
     {
       title: 'Copy URL',
       onClick: () => {
-        navigator.clipboard.writeText(e.target.href)
+        navigator.clipboard.writeText(shortcutTarget.href)
       }
     },
     {
       title: 'Delete',
       onClick: () => {
-        chrome.bookmarks.remove(e.target.getAttribute('data-id'))
+        chrome.bookmarks.remove(shortcutTarget.getAttribute('data-id'))
       }
     },
     {
@@ -699,7 +703,7 @@ window.addEventListener('contextmenu', async e => {
     }
   ]
 
-  if (e.target.getAttribute('data-type') === 'shortcut') {
+  if (e.path.find((e) => e.getAttribute && e.getAttribute('data-type') === 'shortcut')) {
     buttons = buttons.concat(bookmarkActions)
   } else if (e.path.filter(el => el.id === 'editor').length > 0) {
     buttons = buttons.concat([

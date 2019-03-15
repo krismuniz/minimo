@@ -2,11 +2,16 @@
 
 All notable changes to Minimo will be documented in this file.
 
-## 1.1.3 - 2018-20-12
+## 1.1.4 - 2019-03-03
+
+- Prevent shortcuts from launching when clicking while holding metaKey/ctrlKey (link should only open in new tab)
+- Increase right-click (context menu) area for bookmark links to include favicons
+
+## 1.1.3 - 2018-12-20
 
 - Fix issue where Minimo ignored the default clock setting (12h or 24h)
 
-##  1.1.2 – 2018-17-12
+##  1.1.2 – 2018-12-17
 
 - Minor adjustments to ❄️❄️❄️ feature
 

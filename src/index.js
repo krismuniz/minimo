@@ -268,7 +268,7 @@ const refreshDate = async () => {
 let syncedTabsHash = ''
 
 const loadSyncedTabs = () => {
-  const showTabs = localStorage.getItem('devices') && localStorage.getItem('devices') === 'show'
+  const showTabs = !localStorage.getItem('devices') || localStorage.getItem('devices') && localStorage.getItem('devices') === 'show'
 
   if (!showTabs) {
     syncedTabsHash = ''

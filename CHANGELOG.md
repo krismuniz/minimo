@@ -2,6 +2,10 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.2.1 - 2019-06-15
+
+- Minor bug fix with synced tabs where the default state was hidden
+
 ## 1.2.0 - 2019-06-15
 
 - Add the ability to hide connection status text [#22](https://github.com/krismuniz/minimo/issues/22)

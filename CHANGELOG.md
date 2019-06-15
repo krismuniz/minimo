@@ -2,6 +2,12 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.2.0 - 2019-06-15
+
+- Add the ability to hide connection status text [#22](https://github.com/krismuniz/minimo/issues/22)
+- Add the ability to hide synced remote tabs [#22](https://github.com/krismuniz/minimo/issues/22)
+- Increase the synced tabs limit from 3 to 5 [#21](https://github.com/krismuniz/minimo/issues/21)
+
 ## 1.1.4 - 2019-03-03
 
 - Prevent shortcuts from launching when clicking while holding metaKey/ctrlKey (link should only open in new tab)

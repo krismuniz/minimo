@@ -334,7 +334,7 @@ const loadSyncedTabs = () => {
           }
         )
 
-        if (box.children.length < 3) {
+        if (box.children.length < 5) {
           box.appendChild(element)
         }
       }

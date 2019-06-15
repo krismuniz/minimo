@@ -10,7 +10,7 @@ An elegant, simplified new tab page replacement for Google Chrome.
 
 Minimo is only available for [Google Chrome](https://chrome.google.com) and [Brave](https://brave.com) on the [Chrome Webstore](https://chrome.google.com/webstore/detail/minimo/fanglmholkgdapjcfohfhnofcacjiodl) for now. 
 
-Do you want minimo to support other browser? [Let us know!](https://github.com/krismuniz/minimo/issues/new)
+Do you want minimo to support other browser? [Let us know!](https://github.com/krismuniz/minimo/issues/new?assignees=&labels=platform+support&template=browser-support.md&title=)
 
 ## Features
 
@@ -61,7 +61,7 @@ Although this extension reads your bookmarks and session data to display shortcu
 
 #### Bug Reports & Feature Requests
 
-Something does not work as expected or perhaps you think this extension _needs_ a feature? Please open an issue using GitHub [issue tracker](https://github.com/krismuniz/minimo/issues/new). 
+Something does not work as expected or perhaps you think this extension _needs_ a feature? Please open an issue using GitHub [issue tracker](https://github.com/krismuniz/minimo/issues/new?assignees=krismuniz&labels=bug&template=bug-report.md&title=). 
 
 Make sure that an issue pointing out your specific problem does not exist already. Please be as specific and straightforward as possible.
 

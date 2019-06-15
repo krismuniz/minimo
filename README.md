@@ -61,7 +61,7 @@ Although this extension reads your bookmarks and session data to display shortcu
 
 #### Bug Reports & Feature Requests
 
-Something does not work as expected or perhaps you think this extension _needs_ a feature? Please open an issue using GitHub [issue tracker](https://github.com/krismuniz/minimo/issues/new?assignees=krismuniz&labels=bug&template=bug-report.md&title=). 
+Something does not work as expected or perhaps you think this extension _needs_ a feature? Please open an issue using GitHub [issue tracker](https://github.com/krismuniz/minimo/issues/new/choose). 
 
 Make sure that an issue pointing out your specific problem does not exist already. Please be as specific and straightforward as possible.
 

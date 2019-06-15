@@ -3,8 +3,6 @@ const store = chrome.storage.sync
 const SHORTCUTS_FOLDER = 'Shortcuts'
 const IS_MAC = window.navigator.platform.indexOf('Mac') !== -1
 const today = new Date()
-let holiday = false
-let specialMessage = false
 
 const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g class="nc-icon-wrapper" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" transform="translate(0.5 0.5)" stroke="currentColor"><path fill="none" stroke="currentColor" stroke-miterlimit="10" d="M10,23H3 c-1.105,0-2-0.895-2-2V3c0-1.105,0.895-2,2-2h12c1.105,0,2,0.895,2,2v7"/> <circle data-stroke="none" cx="9" cy="18" r="1" stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M14.126,17 c0.444-1.725,2.01-3,3.874-3c1.48,0,2.772,0.804,3.464,1.999"/> <polygon data-color="color-2" data-stroke="none" points="23.22,13.649 22.792,18 18.522,17.061 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/> <path data-cap="butt" data-color="color-2" fill="none" stroke-miterlimit="10" d="M21.874,20 c-0.444,1.725-2.01,3-3.874,3c-1.48,0-2.772-0.804-3.464-1.999"/> <polygon data-color="color-2" data-stroke="none" points="12.78,23.351 13.208,19 17.478,19.939 " stroke-linejoin="miter" stroke-linecap="square" stroke="none"/></g></svg>'
 
@@ -53,13 +51,15 @@ const setupSettingsDialog = () => {
   const faviconsInput = $('#settings-favicons-input')
   const timeformatInput = $('#settings-timeformat-input')
   const batteryInput = $('#settings-battery-input')
+  const connectionInput = $('#settings-connection-input')
+  const devicesInput = $('#settings-devices-input')
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
   // keyboard shortcut overrides
   const writingModeShortcutInput = $('#settings-writing-mode-shortcut-input')
 
-  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery'], (settings) => {
+  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery', 'connection', 'devices'], (settings) => {
     let preset = {
       mode: localStorage.getItem('mode') || 'dark',
       theme: localStorage.getItem('theme') || 'smooth-dark',
@@ -67,6 +67,8 @@ const setupSettingsDialog = () => {
       favicons: localStorage.getItem('favicons') || 'hide',
       timeformat: localStorage.getItem('timeformat') || '12',
       battery: localStorage.getItem('battery') || 'show',
+      connection: localStorage.getItem('connection') || 'show',
+      devices: localStorage.getItem('devices') || 'show',
       writingModeShortcut: localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+⌘' : 'ctrl+shift'),
       ...settings
     }
@@ -89,6 +91,16 @@ const setupSettingsDialog = () => {
     $('#settings-battery-input').removeAttribute('checked')
     if (preset.battery === 'show') {
       $(`#settings-battery-input`).setAttribute('checked', 'checked')
+    }
+
+    $('#settings-connection-input').removeAttribute('checked')
+    if (preset.connection === 'show') {
+      $('#settings-connection-input').setAttribute('checked', 'checked')
+    }
+
+    $('#settings-devices-input').removeAttribute('checked')
+    if (preset.devices === 'show') {
+      $('#settings-devices-input').setAttribute('checked', 'checked')
     }
 
     $('#settings-writing-mode-shortcut-input').value = preset.writingModeShortcut
@@ -140,6 +152,19 @@ const setupSettingsDialog = () => {
   batteryInput.addEventListener('change', (ev) => {
     store.set({ battery: ev.target.checked ? 'show' : 'hide' }, () => {
       localStorage.setItem('battery', ev.target.checked ? 'show' : 'hide')
+    })
+  })
+
+  connectionInput.addEventListener('change', (ev) => {
+    store.set({ connection: ev.target.checked ? 'show' : 'hide' }, () => {
+      localStorage.setItem('connection', ev.target.checked ? 'show' : 'hide')
+    })
+  })
+
+  devicesInput.addEventListener('change', (ev) => {
+    store.set({ connection: ev.target.checked ? 'show' : 'hide' }, () => {
+      localStorage.setItem('devices', ev.target.checked ? 'show' : 'hide')
+      loadSyncedTabs()
     })
   })
 
@@ -210,35 +235,47 @@ const formatTime = (date) => {
 
 const refreshDate = async () => {
   const date = new Date()
-  const speed = navigator.connection.downlink
-  const connection = navigator.onLine
-    ? (speed === 10 ? '> ' + speed : '~' + speed) + ' Mbps'
-    : 'Offline'
+  let status = ''
+
+  const showConnection = !localStorage.getItem('connection') || localStorage.getItem('connection') === 'show'
+  const showBattery = !localStorage.getItem('battery') || localStorage.getItem('battery') === 'show'
   
   $('.time').textContent = formatTime(date)
   $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
-  let status = connection;
 
-  if (localStorage.getItem('battery') === 'show') {
+  if (showConnection) {
+    const speed = navigator.connection.downlink
+
+    const connection = navigator.onLine
+      ? (speed === 10 ? '> ' + speed : '~' + speed) + ' Mbps'
+      : 'Offline'
+
+    status += connection
+  }
+
+  if (showBattery) {
     const battery = await navigator.getBattery()
     const batteryHealth = (battery.level * 100).toFixed() + '% ' + (battery.charging ? 'Charging' : 'Battery')
-    status +=  ' · ' + batteryHealth
-  }
 
-  const message = typeof specialMessage === 'function' ? specialMessage({ date }) : specialMessage
+    status += status.length > 0
+      ? ' · ' + batteryHealth
+      : batteryHealth
+  }
 
   $('.status').textContent = status
-  $('.special-message').textContent = (specialMessage && message ? message : '')
-  if (!message) {
-    $('.special-message').classList.add('hidden')
-  } else {
-    $('.special-message').classList.remove('hidden')
-  }
 }
 
 let syncedTabsHash = ''
 
 const loadSyncedTabs = () => {
+  const showTabs = localStorage.getItem('devices') && localStorage.getItem('devices') === 'show'
+
+  if (!showTabs) {
+    syncedTabsHash = ''
+    $('.devices-box .tabs').innerHTML = ''
+    return
+  }
+
   chrome.sessions.getDevices((devices) => {
     let tabs = devices.reduce((p, device) => {
       return p.concat(
@@ -794,183 +831,3 @@ localStorage.getItem('installed')
 
 setKeyListener()
 toggleWelcomeDialog()
-
-/**
- * Let It Snow, Sometimes.
- * Special thanks to Paul Lewis (@aerotwist)
- */
-
-function randBetween (min, max) {
-  return min + Math.random() * (max - min)
-}
-
-class Snowflake {
-  constructor ({ colors }) {
-    this.x = 0
-    this.y = 0
-    this.vx = 0
-    this.vy = 0
-    this.radius = 0
-    this.velocity = 0
-    this.alpha = 0
-    this.availableColors = colors
-
-    this.reset()
-  }
-
-  reset () {
-    this.x = randBetween(0, window.innerWidth)
-    this.y = randBetween(0, -window.innerHeight)
-    this.vx = randBetween(-3, 3)
-    this.vy = randBetween(2, 3)
-    this.radius = randBetween(1, 4)
-    this.alpha = randBetween(0.1, 0.9)
-    this.color = this.availableColors[
-      Math.round(
-        randBetween(0, this.availableColors.length - 1)
-      )
-    ]
-  }
-
-  update () {
-    this.x += this.vx
-    this.y += this.vy
-
-    if (this.y + this.radius > window.innerHeight) {
-      this.reset()
-    }
-  }
-}
-
-class Snow {
-  constructor ({ colors }) {
-    this.canvas = document.createElement('canvas')
-    this.container = el('div#holiday-canvas.holidays', this.canvas)
-    this.ctx = this.canvas.getContext('2d')
-    this.updateBound = this.update.bind(this)
-    this.colors = colors
-
-    document.body.appendChild(this.container)
-
-    $('#settings-css-info').innerHTML = `To stop the snow, add <code>.holidays { display: none; }</code>`
-    window.addEventListener('resize', () => this.onResize())
-
-    this.onResize()
-    this.createSnowFlakes()
-    requestAnimationFrame(this.updateBound)
-  }
-  
-  onResize () {
-    this.width = window.innerWidth
-    this.height = window.innerHeight
-    this.canvas.width = this.width
-    this.canvas.height = this.height
-  }
-
-  changeColors (colors) {
-    this.colors = colors
-    this.createSnowFlakes()
-  }
-
-  createSnowFlakes () {
-    const flakes = window.innerWidth / 4
-    this.snowflakes = []
-
-    for (let i = 0; i < flakes; i++) {
-      this.snowflakes.push(
-        new Snowflake({
-          colors: this.colors
-        })
-      )
-    }
-  }
-  
-  update () {
-    this.ctx.clearRect(0, 0, this.width, this.height)
-
-    for (let flake of this.snowflakes) {
-      flake.update()
-
-      this.ctx.save()
-      this.ctx.fillStyle = flake.color || '#FFFFFF'
-      this.ctx.beginPath()
-      this.ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2)
-      this.ctx.closePath()
-      this.ctx.globalAlpha = flake.alpha
-      this.ctx.fill()
-      this.ctx.restore()
-    }
-
-    requestAnimationFrame(this.updateBound)
-  }
-}
-
-const snowDays = [
-  {
-    message: 'Happy Holidays!',
-    colors: ['#FFFFFF'],
-    month: 12,
-    day: 24 // Christmas Eve
-  },
-  {
-    message: 'Happy Holidays!',
-    colors: [
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#FFFFFF',
-      '#EF2D56',
-      '#0CCE6B'
-    ],
-    month: 12,
-    day: 25 // Christmas Day
-  },
-  {
-    message: ({ date }) => {
-      const nextYear = date.getFullYear() + 1
-      const h = date.getHours()
-      const m = date.getMinutes()
-      const s = date.getSeconds()
-
-      const hrs = 24 - h - 1
-      const min = 60 - m - 1
-      const sec = 60 - s - 1
-
-      return hrs <= 5
-        ? (hrs === 0 && min === 0 ? `${sec}s` : `${hrs}h ${min}m ${sec}s to New Year ${nextYear}`)
-        : ''
-    },
-    colors: ['#FFFFFF'],
-    month: 12, 
-    day: 31 // New Year's Eve
-  },
-  {
-    message: 'Happy New Year!',
-    colors: [
-      '#0CCE6B',
-      '#DCED31',
-      '#EF2D56',
-      '#ED7D3A'
-    ],
-    month: 1, 
-    day: 1 // New Year's Day
-  }
-]
-
-for (let day of snowDays) {
-  if (today.getDate() === day.day && today.getMonth() + 1 === day.month && holiday === false) {
-    holiday = new Snow({
-      colors: day.colors || ['#FFFFFF']
-    })
-    if (day.message) specialMessage = day.message 
-  }
-}

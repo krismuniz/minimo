@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: "Thank you for helping us improve Minimo! Don't forget to label your issue to help our contributors solve this issue quicker."
+        pr-message: "Thank you for contributing to Minimo! Don't forget to label your pull request to help our contributors when reviewing this Pull Request!"

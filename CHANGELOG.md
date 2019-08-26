@@ -2,6 +2,11 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.3.0 - 2019-08-25
+
+- Added _beta_ support for custom time zone clocks! [#23](https://github.com/krismuniz/minimo/issues/23)
+- Added placeholder helpers for shortcuts dialog
+
 ## 1.2.1 - 2019-06-15
 
 - Minor bug fix with synced tabs where the default state was hidden

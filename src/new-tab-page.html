@@ -16,6 +16,7 @@
   <script src="./libraries/quill.min.js"></script>
   <script src="./libraries/modikeys.js"></script>
   <script src="./libraries/debounce.js"></script>
+  <script src="./libraries/timezones.js"></script>
   <!-- libraries that depend on the DOM being loaded -->
   <script defer src="index.js"></script>
   <div id="welcome-dialog" class="dialog corner hidden">
@@ -36,17 +37,36 @@
       <div id="shortcut-dialog-title" class="dialog-title">Edit shortcut</div>
       <div class="input-container">
         <label for="shortcut-name-input">Name</label>
-        <input id="shortcut-name-input" type="text" autofocus tabindex="1" aria-label="Name" data-context-menu="default">
+        <input id="shortcut-name-input" placeholder='e.g. "Google", "Work Mail", etc.' type="text" autofocus tabindex="1" aria-label="Name" data-context-menu="default">
         <span id="shortcut-name-feedback"></span>
       </div>
       <div class="input-container">
         <label for="shortcut-url-input">URL</label>
-        <input id="shortcut-url-input" type="url" tabindex="2" aria-label="URL" data-context-menu="default">
+        <input id="shortcut-url-input" placeholder='e.g. "https://example.com"' type="url" tabindex="2" aria-label="URL" data-context-menu="default">
         <span id="shortcut-url-feedback"></span>
       </div>
       <div class="button-group">
         <button id="shortcut-cancel-button" class="button">Cancel</button>
         <button id="shortcut-save-button" class="button primary">Save</button>
+      </div>
+    </div>
+    <div id="tz-dialog" class="dialog hidden">
+      <div id="tz-dialog-title" class="dialog-title">Add a time zone clock</div>
+      <div class="input-container">
+        <label for="tz-name-input">Friendly Name</label>
+        <input id="tz-name-input" maxlength="16" type="text" autofocus tabindex="1" aria-label="Friendly Time Zone Name" data-context-menu="default" placeholder='e.g. "Los Angeles", "Home", etc'>
+        <span id="tz-name-feedback"></span>
+      </div>
+      <div class="input-container">
+        <label for="tz-timezone-input">Time Zone</label>
+        <input id="tz-timezone-input" list="tz-timezone-list" type="text" autofocus tabindex="1" aria-label="Time Zone Name" data-context-menu="default" placeholder='e.g. "America / Los Angeles"'>
+        <datalist id="tz-timezone-list"></datalist>
+        <span id="tz-timezone-feedback"></span>
+      </div>
+      <p class="info" style="max-width: 25rem;">Time zones are still in <em>beta</em>. <a class="url" href="https://github.com/krismuniz/minimo/issues/new/choose">Let us know</a> how we can improve this feature.</p>
+      <div class="button-group">
+        <button id="tz-cancel-button" class="button">Cancel</button>
+        <button id="tz-save-button" class="button primary">Save</button>
       </div>
     </div>
     <div id="settings-dialog" class="dialog hidden">
@@ -91,6 +111,7 @@
         <input id="settings-battery-input" type="checkbox" />
         <label class="inline" for="settings-battery-input">Show Battery</label>
       </div>
+      <div class="menu-divider" style="margin-bottom: 1rem;"></div>
       <details>
         <summary>Advanced Settings</summary>
         <div class="input-container">
@@ -128,8 +149,9 @@
       <span class="time"></span>
       <span class="date"></span>
       <span class="status"></span>
-      <span class="special-message hidden holidays"></span>
+      <span class="special-message hidden"></span>
     </div>
+    <div id="tz-box"></div>
     <div class="devices-box">
       <div class="tabs"></div>
     </div>

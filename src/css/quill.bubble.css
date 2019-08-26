@@ -17,8 +17,8 @@
 }
 
 ::selection {
-  background-color: var(--text-color);
-  color: var(--background-color);
+  background-color: var(--focus-color);
+  color: #fff;
 }
 
 .ql-container.ql-disabled .ql-tooltip {
@@ -422,7 +422,6 @@
   background: none;
   border: none;
   cursor: pointer;
-  display: inline-block;
   float: left;
   height: 24px;
   padding: 3px 5px;

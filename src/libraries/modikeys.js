@@ -4,6 +4,7 @@ window.modikeys = (cb, opts = { preventDefault: true }) => {
 
   return (e) => {
     if (opts.preventDefault) e.preventDefault()
+    if (!e.key) return false
 
     const keys = new Set([
       e.ctrlKey ? (isMac ? 'control': 'ctrl') : undefined,

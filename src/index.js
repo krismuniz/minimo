@@ -69,7 +69,7 @@ const setupSettingsDialog = () => {
       battery: localStorage.getItem('battery') || 'show',
       connection: localStorage.getItem('connection') || 'show',
       devices: localStorage.getItem('devices') || 'show',
-      writingModeShortcut: localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+⌘' : 'ctrl+shift'),
+      writingModeShortcut: localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+command' : 'ctrl+shift'),
       ...settings
     }
 
@@ -221,16 +221,52 @@ const editShortcut = (id, title, url) => {
   chrome.bookmarks.update(id, { title, url })
 }
 
-const formatTime = (date) => {
-  const timeformat = localStorage.getItem('timeformat') || '12'
-  const h = date.getHours()
-  const m = date.getMinutes()
-  const hours = timeformat === '12'
-    ? h === 0 || h === 12 ? '12' : h % 12
-    : h
-  const minutes = m < 10 ? '0' + m : m
+const addTZ = (name, timezone) => {
+  const timezones = JSON.parse(localStorage.getItem('timezones')) || []
+  
+  localStorage.setItem(
+    'timezones',
+    JSON.stringify(
+      [ ...timezones, { id: Math.random().toString(36).substr(2, 9), name, timezone } ]
+    )
+  )
+}
 
-  return `${hours}:${minutes}`
+const editTZ = (id, name, timezone) => {
+  const timezones = JSON.parse(localStorage.getItem('timezones')) || []
+
+  localStorage.setItem('timezones', JSON.stringify(
+    timezones.map(
+      (v) => {
+        return v.id === id ? { id, name, timezone } : v
+      }
+    )
+  ))
+}
+
+const moveTZ = (id, to) => {
+  const timezones = JSON.parse(localStorage.getItem('timezones')) || []
+  const from = timezones.map((v) => v.id).indexOf(id)
+
+  console.log(timezones)
+  timezones.splice(to, 0, timezones.splice(from, 1)[0])
+  console.log(timezones)
+  localStorage.setItem(
+    'timezones',
+    JSON.stringify(
+      timezones.filter(Boolean)
+    )
+  )
+}
+
+const deleteTZ = (id) => {
+  const timezones = JSON.parse(localStorage.getItem('timezones')) || []
+  localStorage.setItem(
+    'timezones',
+    JSON.stringify(
+      timezones.filter((v) => v.id !== id)
+    )
+  )
 }
 
 const refreshDate = async () => {
@@ -239,8 +275,15 @@ const refreshDate = async () => {
 
   const showConnection = !localStorage.getItem('connection') || localStorage.getItem('connection') === 'show'
   const showBattery = !localStorage.getItem('battery') || localStorage.getItem('battery') === 'show'
-  
-  $('.time').textContent = formatTime(date)
+  const hour12 = localStorage.getItem('timeformat') && localStorage.getItem('timeformat') !== '12' ? false : '12'
+  const timezones = JSON.parse(localStorage.getItem('timezones')) || []
+
+  $('.time').textContent = date.toLocaleTimeString(navigator.language, {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12
+  }).match(/(\d|\:)*/gi).filter(Boolean)[0]
+
   $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
 
   if (showConnection) {
@@ -260,6 +303,44 @@ const refreshDate = async () => {
     status += status.length > 0
       ? ' · ' + batteryHealth
       : batteryHealth
+  }
+
+  for (let zone of timezones) {
+    const tz = $(`#tz-box .tz-clock[data-id="${zone.id}"]`)
+
+    if (!tz) {
+      $('#tz-box').appendChild(
+        el(`div.tz-clock`, {
+          'data-type': 'tz-clock',
+          'data-timezone': zone.timezone,
+          'data-name': zone.name,
+          'data-id': zone.id
+        }, [
+          el('div.tz-name'),
+          el('div.tz-time')
+        ])
+      )
+    }
+  }
+
+  for (let tzClock of $('#tz-box').children) {
+    const zone = timezones.find(({ id }) => id === tzClock.getAttribute('data-id'))
+
+    const time = date.toLocaleTimeString(navigator.language, {
+      hour: 'numeric',
+      minute: 'numeric',
+      timeZone: zone.timezone,
+      hour12
+    })
+
+    if (zone) {
+      tzClock.setAttribute('data-timezone', zone.timezone)
+      tzClock.setAttribute('data-name', zone.name)
+      tzClock.children[0].textContent = zone.name
+      tzClock.children[1].textContent = time
+    } else {
+      tzClock.remove()
+    }
   }
 
   $('.status').textContent = status
@@ -325,6 +406,7 @@ const loadSyncedTabs = () => {
           {
             href: '#',
             title: tab.title,
+            'data-type': 'shortcut',
             click: () => {
               chrome.sessions.restore(tab.sessionId)
             },
@@ -497,6 +579,77 @@ window.addEventListener('blur', (event) => {
   }
 })
 
+const timezonePrompt = (name, timezone, type = '', callback) => {
+  const dialog = $('#tz-dialog')
+  const overlay = $('.overlay')
+
+  overlay.classList.remove('hidden')
+  dialog.classList.remove('hidden')
+  dialog.classList.add('animate')
+
+  $('#tz-dialog-title').textContent = `${type === 'add' ? 'Add' : 'Edit'} time zone`
+  $('#tz-name-input').value = name
+  $('#tz-timezone-input').value = timezone
+
+  $('#tz-name-input').focus()
+
+  const hideDialog = () => {
+    dialog.classList.remove('animate')
+    dialog.classList.add('hidden')
+    overlay.classList.add('hidden')
+    removeHandlers()
+  }
+
+  const saveHandler = () => {
+    const name = $('#tz-name-input').value
+    const timezone = $('#tz-timezone-input').value.replace(/\s\/\s/g, '/').replace(/\s/g, '_')
+
+    $('#tz-name-feedback').textContent = ''
+    $('#tz-timezone-feedback').textContent = ''
+
+    if (!name || !timezone) {
+      $('#tz-name-feedback').textContent = !name ? 'Please provide a friendly name' : ''
+      $('#tz-timezone-feedback').textContent = !timezone ? 'Please select a time zone' : ''
+      return
+    }
+
+    if (!window.tzList.includes(timezone)) {
+      $('#tz-timezone-feedback').textContent = 'Sorry, that time zone is not a valid time zone'
+      return
+    }
+
+    callback({ name, timezone })
+    hideDialog()
+  }
+
+  const keyHandler = (e) => {
+    if (!e.code) return
+    switch (e.code.toLowerCase()) {
+      case 'enter': {
+        saveHandler()
+        break
+      }
+      case 'escape': {
+        hideDialog()
+        break
+      }
+      default:
+        return
+    }
+  }
+
+  const removeHandlers = () => {
+    $('#tz-save-button').removeEventListener('click', saveHandler)
+    $('#tz-cancel-button').removeEventListener('click', hideDialog)
+    dialog.removeEventListener('keydown', keyHandler)
+  }
+
+  dialog.addEventListener('keydown', keyHandler)
+
+  $('#tz-save-button').addEventListener('click', saveHandler)
+  $('#tz-cancel-button').addEventListener('click', hideDialog)
+}
+
 const shortcutPrompt = (title, url, type = 'edit', callback) => {
   const dialog = $('#shortcut-dialog')
   const overlay = $('.overlay')
@@ -505,7 +658,7 @@ const shortcutPrompt = (title, url, type = 'edit', callback) => {
   dialog.classList.remove('hidden')
   dialog.classList.add('animate')
 
-  $('#shortcut-dialog-title').textContent = `${type === 'add' ? 'Add new' : 'Edit'} shortcut`
+  $('#shortcut-dialog-title').textContent = `${type === 'add' ? 'Add' : 'Edit'} shortcut`
   $('#shortcut-name-input').value = title
   $('#shortcut-url-input').value = url
 
@@ -544,6 +697,7 @@ const shortcutPrompt = (title, url, type = 'edit', callback) => {
   }
 
   const keyHandler = (e) => {
+    if (!e.code) return
     switch (e.code.toLowerCase()) {
       case 'enter': {
         saveHandler()
@@ -587,7 +741,11 @@ window.addEventListener('contextmenu', async e => {
   let buttons = []
 
   const shortcutTarget = e.path.find((element) => {
-    return (element && element.getAttribute) && element.getAttribute('data-type') && element.getAttribute('data-id')
+    return (element && element.getAttribute) && element.getAttribute('data-type') === 'shortcut' && element.getAttribute('data-id')
+  })
+
+  const tzTarget = e.path.find((element) => {
+    return (element, element.getAttribute) && element.getAttribute('data-type') === 'tz-clock' && element.getAttribute('data-id')
   })
 
   const bookmarkActions = [
@@ -643,7 +801,7 @@ window.addEventListener('contextmenu', async e => {
       type: 'divider'
     },
     {
-      title: 'Add new shortcut',
+      title: 'Add shortcut',
       onClick: () => {
         shortcutPrompt('', '', 'add', ({ title, url }) => {
           addShortcut(title, url)
@@ -689,7 +847,7 @@ window.addEventListener('contextmenu', async e => {
   ]
 
   const addShortcutItem = {
-    title: 'Add new shortcut',
+    title: 'Add shortcut',
     onClick: () => {
       shortcutPrompt('', '', 'add', ({ title, url }) => {
         addShortcut(title, url)
@@ -697,8 +855,19 @@ window.addEventListener('contextmenu', async e => {
     }
   }
 
+  const addTimeZone = {
+    title: 'Add time zone',
+    onClick: () => {
+      timezonePrompt('', '', 'add', ({ name, timezone }) => {
+        addTZ(name, timezone)
+        refreshDate()
+      })
+    }
+  }
+
   const customization = [
     ($('#editor-container').classList.contains('hidden') ? addShortcutItem : false),
+    ($('#editor-container').classList.contains('hidden') ? addTimeZone : false),
     {
       title: 'Change appearance',
       onClick: () => {
@@ -740,8 +909,33 @@ window.addEventListener('contextmenu', async e => {
     }
   ]
 
-  if (e.path.find((e) => e.getAttribute && e.getAttribute('data-type') === 'shortcut')) {
+  if (shortcutTarget) {
     buttons = buttons.concat(bookmarkActions)
+  } else if (tzTarget) {
+    buttons = buttons.concat(
+      {
+        title: 'Edit',
+        onClick: () => {
+          const id = tzTarget.getAttribute('data-id')
+          const name = tzTarget.getAttribute('data-name')
+          const timezone = tzTarget.getAttribute('data-timezone')
+          timezonePrompt(name, timezone.replace(/\//g, ' / ').replace(/\_/g, ' '), 'edit', ({ name, timezone }) => {
+            editTZ(id, name, timezone)
+            refreshDate()
+          })
+        }
+      },
+      {
+        title: 'Delete',
+        onClick: () => {
+          deleteTZ(tzTarget.getAttribute('data-id'))
+          tzTarget.remove()
+          refreshDate()
+        }
+      },
+      { type: 'divider' },
+      addTimeZone
+    )
   } else if (e.path.filter(el => el.id === 'editor').length > 0) {
     buttons = buttons.concat([
       ...switcher,
@@ -772,10 +966,18 @@ window.addEventListener('contextmenu', async e => {
 })
 
 Sortable.create($('.bookmarks-box'), {
-  animation: 150,
+  animation: 200,
   dataIdAttr: 'data-sort-id',
   onEnd: (ev) => {
     moveShortcut(ev.item.getAttribute('data-id'), ev.oldIndex < ev.newIndex ? ev.newIndex + 1 : ev.newIndex)
+  }
+})
+
+Sortable.create($('#tz-box'), {
+  animation: 200,
+  dataIdAttr: 'data-sort-id',
+  onEnd: (ev) => {
+    moveTZ(ev.item.getAttribute('data-id'), ev.newIndex)
   }
 })
 
@@ -831,3 +1033,9 @@ localStorage.getItem('installed')
 
 setKeyListener()
 toggleWelcomeDialog()
+
+for (let zone of window.tzList) {
+  $('#tz-timezone-list').appendChild(
+    el('option', zone.replace(/\_/g, ' ').replace(/\//g, ' / '))
+  )
+}

@@ -269,6 +269,18 @@ const deleteTZ = (id) => {
   )
 }
 
+const formatTime = (date) => {
+  const timeformat = localStorage.getItem('timeformat') || '12'
+  const h = date.getHours()
+  const m = date.getMinutes()
+  const hours = timeformat === '12'
+    ? h === 0 || h === 12 ? '12' : h % 12
+    : h
+  const minutes = m < 10 ? '0' + m : m
+
+  return `${hours}:${minutes}`
+}
+
 const refreshDate = async () => {
   const date = new Date()
   let status = ''
@@ -278,12 +290,7 @@ const refreshDate = async () => {
   const hour12 = localStorage.getItem('timeformat') && localStorage.getItem('timeformat') !== '12' ? false : '12'
   const timezones = JSON.parse(localStorage.getItem('timezones')) || []
 
-  $('.time').textContent = date.toLocaleTimeString(navigator.language, {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12
-  }).match(/(\d|\:)*/gi).filter(Boolean)[0]
-
+  $('.time').textContent = formatTime(date)
   $('.date').textContent = date.toLocaleDateString(navigator.language, { weekday: 'long', month: 'long', day: 'numeric' })
 
   if (showConnection) {

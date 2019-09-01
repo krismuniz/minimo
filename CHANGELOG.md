@@ -2,6 +2,10 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.3.2 - 2019-08-31
+
+- Made the Minimo popup respect dark vs. light modes
+
 ## 1.3.0 - 2019-08-25
 
 - Added _beta_ support for custom time zone clocks! [#23](https://github.com/krismuniz/minimo/issues/23)

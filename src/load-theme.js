@@ -19,6 +19,11 @@ const setFavicons = (state) => {
   $('html').classList.add('favicons-' + state)
 }
 
+const setPrefers = (mode) => {
+  $('html').className = Array.from($('html').classList).filter(c => !c.startsWith('prefers-')).join(' ')
+  $('html').classList.add('prefers-' + mode)
+}
+
 const setCss = (css) => {
   $('#custom-style').textContent = css
 }
@@ -35,7 +40,7 @@ const setAppearance = (appearance) => {
 }
 
 const loadAppearance = () => {
-  let mode = localStorage.getItem('mode') || 'dark'
+  let mode = localStorage.getItem('mode') || 'system'
   let theme = localStorage.getItem('theme') || 'smooth-dark'
   let favicons = localStorage.getItem('favicons') || 'hide'
   let timeformat = localStorage.getItem('timeformat') || '12'
@@ -72,6 +77,17 @@ const loadAppearance = () => {
     })
   })
 }
+
+// get preferred color from system
+// AND set an event listener to detect changes
+(function () {
+  let darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  darkQuery.addEventListener('change', function (event) {
+    setPrefers(event.matches ? 'dark' : 'light')
+  })
+
+  setPrefers(darkQuery.matches ? 'dark' : 'light')
+})()
 
 const stats = () => {
   if (!localStorage.getItem('installed')) {

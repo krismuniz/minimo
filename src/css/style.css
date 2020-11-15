@@ -6,7 +6,7 @@
   --favicons-display: none;
 }
 
-.mode-dark:root {
+.mode-system.prefers-dark:root, .mode-dark:root {
   --menu-background: #3C4149;
   --menu-color: white;
 
@@ -24,7 +24,7 @@
   --focus-color: #2a80f0;
 }
 
-.mode-light:root {
+.mode-system.prefers-light:root, .mode-light:root {
   --menu-background: #FFFFFF;
   --menu-color: #24292e;
 
@@ -123,6 +123,10 @@ body {
   color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   user-select: none;
+}
+
+a.url {
+  color: var(--focus-color);
 }
 
 a.url:visited {
@@ -300,7 +304,7 @@ a:not(.button):not(.url):visited {
   border: none;
   font-weight: 400;
   padding: 0.5rem 0.675rem;
-  border-radius: 0.250rem;
+  border-radius: 0.375rem;
   background-color: var(--button-background);
   margin: 1rem;
   font-size: 1rem;
@@ -456,8 +460,20 @@ a:not(.button):not(.url):visited {
   display: none;
 }
 
+.input-container-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.input-container-grid .input-container {
+  margin: 0;
+}
+
 .input-container {
   margin-bottom: 1rem;
+  vertical-align: middle;
 }
 
 .input-container.inline {
@@ -489,20 +505,19 @@ a:not(.button):not(.url):visited {
   text-align: inherit;
   text-overflow: ellipsis;
   width: 100%;
-  -webkit-padding-end: 0.675rem;
-  -webkit-padding-start: 0.675rem;
+  -webkit-padding-end: 0.750rem;
+  -webkit-padding-start: 0.750rem;
   padding-bottom: 0.5rem;
   padding-top: 0.5rem;
-  border-radius: 0.250rem;
+  border-radius: 0.375rem;
   background: var(--input-background);
   caret-color: var(--input-color);
   color: var(--input-color);
-  height: 2rem;
 }
 
 .input-container select {
   -webkit-appearance: menulist;
-  height: 2rem;
+  font-weight: 400;
 }
 
 .input-container textarea {
@@ -549,7 +564,7 @@ summary {
 .tz-clock {
   display: block;
   padding: 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   transition: opacity 200ms ease-in-out;
 }
 

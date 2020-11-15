@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Minimo",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "An elegant, minimal new tab page",
   "homepage_url": "https://www.krismuniz.com/",
   "icons": {

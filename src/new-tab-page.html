@@ -74,6 +74,7 @@
       <div class="input-container">
         <label for="settings-mode-input">Mode</label>
         <select id="settings-mode-input">
+          <option value="system">System Default</option>
           <option value="dark">Dark</option>
           <option value="light">Light</option>
         </select>
@@ -91,25 +92,25 @@
           <option value="savage-pink">Savage Pink</option>
           <option value="bumblebee">Bumblebee</option>
           <option value="persian-green">Persian Green</option>
-          <option disabled>Custom Theme (coming soon)</option>
         </select>
       </div>
-      <div class="input-container inline">
-        <input id="settings-devices-input" type="checkbox" />
-        <label class="inline" for="settings-devices-input">Show Remote Tabs</label>
-      </div>
-      <div class="input-container inline">
-        <input id="settings-favicons-input" type="checkbox" />
-        <label class="inline" for="settings-favicons-input">Show Favicons</label>
-      </div>
-      <br/>
-      <div class="input-container inline">
-        <input id="settings-connection-input" type="checkbox" />
-        <label class="inline" for="settings-connection-input">Show Connection Status</label>
-      </div>
-      <div class="input-container inline">
-        <input id="settings-battery-input" type="checkbox" />
-        <label class="inline" for="settings-battery-input">Show Battery</label>
+      <div class="input-container-grid">
+        <div class="input-container">
+          <input id="settings-devices-input" type="checkbox" />
+          <label class="inline" for="settings-devices-input">Show Remote Tabs</label>
+        </div>
+        <div class="input-container">
+          <input id="settings-favicons-input" type="checkbox" />
+          <label class="inline" for="settings-favicons-input">Show Favicons</label>
+        </div>
+        <div class="input-container">
+          <input id="settings-connection-input" type="checkbox" />
+          <label class="inline" for="settings-connection-input">Show Connection Status</label>
+        </div>
+        <div class="input-container">
+          <input id="settings-battery-input" type="checkbox" />
+          <label class="inline" for="settings-battery-input">Show Battery</label>
+        </div>
       </div>
       <div class="menu-divider" style="margin-bottom: 1rem;"></div>
       <details>

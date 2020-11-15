@@ -2,6 +2,11 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.4.0 - 2020-11-14
+
+- Add the ability to use the system theme preference for dark mode or light mode
+- Fix minor design quirks and glitches
+
 ## 1.3.2 - 2019-08-31
 
 - Made the Minimo popup respect dark vs. light modes

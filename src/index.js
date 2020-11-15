@@ -61,7 +61,7 @@ const setupSettingsDialog = () => {
 
   store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery', 'connection', 'devices'], (settings) => {
     let preset = {
-      mode: localStorage.getItem('mode') || 'dark',
+      mode: localStorage.getItem('mode') || 'system',
       theme: localStorage.getItem('theme') || 'smooth-dark',
       css: localStorage.getItem('css') || '',
       favicons: localStorage.getItem('favicons') || 'hide',
@@ -696,7 +696,6 @@ const shortcutPrompt = (title, url, type = 'edit', callback) => {
       callback({ title, url })
       removeHandlers()
     } catch (e) {
-      console.log(e)
       $('#shortcut-url-feedback').textContent = 'That is an invalid URL'
       return
     }
@@ -731,7 +730,7 @@ const shortcutPrompt = (title, url, type = 'edit', callback) => {
   $('#shortcut-cancel-button').addEventListener('click', hideDialog)
 }
 
-const settingsPrompt = () => {
+const showSettingsPrompt = () => {
   $('.overlay').classList.remove('hidden')
   $('#settings-dialog').classList.remove('hidden')
   $('#settings-dialog').classList.add('animate')
@@ -878,7 +877,7 @@ window.addEventListener('contextmenu', async e => {
     {
       title: 'Change appearance',
       onClick: () => {
-        settingsPrompt()
+        showSettingsPrompt()
       }
     }
   ]

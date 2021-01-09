@@ -14,10 +14,14 @@ const showEditor = () => {
 }
 
 const hideEditor = () => {
+  quill.blur()
   $('#editor-container').classList.add('hidden')
   $('#editor-container').classList.remove('animate')
+
+  setTimeout(() => {
+    $('.layout').classList.remove('animate-land')
+  }, 100)
   $('.layout').classList.add('animate-land')
-  quill.blur()
 }
 
 const toggleEditor = () => {

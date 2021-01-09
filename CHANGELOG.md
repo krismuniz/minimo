@@ -2,6 +2,10 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.4.1 - 2020-11-15
+
+- Fixes issue #27 where leaving writing mode shows an unexpected scrollbar around Minimo.
+
 ## 1.4.0 - 2020-11-14
 
 - Add the ability to use the system theme preference for dark mode or light mode

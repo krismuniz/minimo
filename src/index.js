@@ -750,11 +750,13 @@ window.addEventListener('contextmenu', async e => {
 
   let buttons = []
 
-  const shortcutTarget = e.path.find((element) => {
+  const eventPath = e.composedPath()
+
+  const shortcutTarget = eventPath.find((element) => {
     return (element && element.getAttribute) && element.getAttribute('data-type') === 'shortcut' && element.getAttribute('data-id')
   })
 
-  const tzTarget = e.path.find((element) => {
+  const tzTarget = eventPath.find((element) => {
     return (element, element.getAttribute) && element.getAttribute('data-type') === 'tz-clock' && element.getAttribute('data-id')
   })
 
@@ -946,7 +948,7 @@ window.addEventListener('contextmenu', async e => {
       { type: 'divider' },
       addTimeZone
     )
-  } else if (e.path.filter(el => el.id === 'editor').length > 0) {
+  } else if (eventPath.filter(el => el.id === 'editor').length > 0) {
     buttons = buttons.concat([
       ...switcher,
       { type: 'divider' },
@@ -964,7 +966,7 @@ window.addEventListener('contextmenu', async e => {
     ])
   }
 
-  if (e.path.filter(element => element.classList && element.classList.contains('overlay')).length === 0) {
+  if (eventPath.filter(element => element.classList && element.classList.contains('overlay')).length === 0) {
     setButtons(buttons.filter(Boolean))
     setPosition(origin)
   }

@@ -2,6 +2,10 @@
 
 All notable changes to Minimo will be documented in this file.
 
+## 1.4.2 - 2023-01-21
+
+- Fix issue caused by the deprecation of `Event.path` (see [Feature: Deprecate Event.path (Removed)](https://chromestatus.com/feature/5726124632965120)). Replaced with `Event.composedPath()` (see [Event.composedPath on MDN](https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath))
+
 ## 1.4.1 - 2020-11-15
 
 - Fixes issue where leaving writing mode shows an unexpected scrollbar around Minimo. [#27](https://github.com/krismuniz/minimo/issues/27)

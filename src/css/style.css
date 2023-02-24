@@ -401,6 +401,12 @@ a:not(.button):not(.url):visited {
   margin: 0.5rem 1.5rem;
 }
 
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+}
+
 .menu-option:hover:not(.disabled) {
   background: var(--input-background);
 }

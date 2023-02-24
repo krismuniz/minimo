@@ -57,13 +57,14 @@ const setupSettingsDialog = () => {
   const batteryInput = $('#settings-battery-input')
   const connectionInput = $('#settings-connection-input')
   const devicesInput = $('#settings-devices-input')
+  const shortcutInput = $('#settings-shortcut-input')
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
 
   // keyboard shortcut overrides
   const writingModeShortcutInput = $('#settings-writing-mode-shortcut-input')
 
-  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery', 'connection', 'devices'], (settings) => {
+  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery', 'connection', 'devices', 'shortcuts'], (settings) => {
     let preset = {
       mode: localStorage.getItem('mode') || 'system',
       theme: localStorage.getItem('theme') || 'smooth-dark',
@@ -73,6 +74,7 @@ const setupSettingsDialog = () => {
       battery: localStorage.getItem('battery') || 'show',
       connection: localStorage.getItem('connection') || 'show',
       devices: localStorage.getItem('devices') || 'show',
+      shortcuts: localStorage.getItem('shortcuts') || 'show',
       writingModeShortcut: localStorage.getItem('writing-mode-shortcut') || (IS_MAC ? 'shift+command' : 'ctrl+shift'),
       ...settings
     }
@@ -105,6 +107,11 @@ const setupSettingsDialog = () => {
     $('#settings-devices-input').removeAttribute('checked')
     if (preset.devices === 'show') {
       $('#settings-devices-input').setAttribute('checked', 'checked')
+    }
+    
+    $('#settings-shortcut-input').removeAttribute('checked')
+    if (preset.shortcuts === 'show') {
+      $('#settings-shortcut-input').setAttribute('checked', 'checked')
     }
 
     $('#settings-writing-mode-shortcut-input').value = preset.writingModeShortcut
@@ -169,6 +176,14 @@ const setupSettingsDialog = () => {
     store.set({ connection: ev.target.checked ? 'show' : 'hide' }, () => {
       localStorage.setItem('devices', ev.target.checked ? 'show' : 'hide')
       loadSyncedTabs()
+    })
+  })
+
+  shortcutInput.addEventListener('change', (ev) => {
+    const newValue = ev.target.checked ? 'show' : 'hide'
+    store.set({ shortcuts: newValue }, () => {
+      localStorage.setItem('shortcuts', newValue)
+      loadBookmarks()
     })
   })
 
@@ -438,6 +453,16 @@ const loadSyncedTabs = () => {
 }
 
 const loadBookmarks = () => {
+  // same as
+  // const showTabs = !localStorage.getItem('devices') || localStorage.getItem('devices') && localStorage.getItem('devices') === 'show'
+  // but removed an unwanted section
+  const showBookmarks = !localStorage.getItem('shortcuts') || localStorage.getItem('shortcuts') === 'show'
+
+  if (!showBookmarks) {
+    $('.bookmarks-box').innerHTML = ''
+    return
+  }
+
   chrome.bookmarks.getSubTree('1', (tree) => {
     const folder = tree[0].children.find(v => v.title.toLowerCase() === SHORTCUTS_FOLDER.toLowerCase())
 

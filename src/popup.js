@@ -11,19 +11,7 @@ const loadShortcuts = () => {
         $('#shortcuts').appendChild(
           el(
             'div.action.link',
-            el(
-              'div.favicon',
-              el(
-                'img',
-                {
-                  src: `chrome://favicon/size/16@1x/${bookmark.url}`,
-                  srcset: `
-                    chrome://favicon/size/16@1x/${bookmark.url},
-                    chrome://favicon/size/16@2x/${bookmark.url} 2x
-                  `
-                }
-              )
-            ),
+            faviconOf(bookmark.url),
             bookmark.title,
             {
               title: bookmark.title,
@@ -73,19 +61,7 @@ const loadDeviceTabs = () => {
       for (let tab of tabs) {
         let element = el(
           'div.action.truncate',
-          el(
-            'div.favicon',
-            el(
-              'img',
-              {
-                src: `chrome://favicon/size/16@1x/${tab.url}`,
-                srcset: `
-                  chrome://favicon/size/16@1x/${tab.url},
-                  chrome://favicon/size/16@2x/${tab.url} 2x
-                `
-              }
-            )
-          ),
+          faviconOf(tab.url),
           tab.deviceName + ' › ' + tab.title,
           {
             href: '#',

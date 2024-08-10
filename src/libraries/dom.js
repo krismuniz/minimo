@@ -1,3 +1,17 @@
+function faviconURL(pageURL, size = 32) {
+  const url = new URL(chrome.runtime.getURL("/_favicon/"));
+  url.searchParams.set("pageUrl", pageURL);
+  url.searchParams.set("size", size);
+  return url.toString();
+}
+
+const faviconOf = (url) => {
+  return el(
+    'div.favicon',
+    el('img', { src: faviconURL(url) })
+  )
+}
+
 window.$ = (q) => document.querySelector(q)
 
 const isContent = (p) => (

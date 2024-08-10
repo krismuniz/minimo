@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Minimo",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "An elegant, minimal new tab page",
   "homepage_url": "https://www.krismuniz.com/",
   "icons": {
@@ -15,13 +15,12 @@
     "storage",
     "sessions",
     "tabs",
-    "chrome://favicon/"
+    "favicon"
   ],
   "background": {
-    "scripts": ["./src/background.js"],
-    "persistent": false
+    "service_worker": "./src/background.js"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Minimo",
     "default_popup": "./src/popup.html"
   },

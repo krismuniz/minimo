@@ -13,6 +13,22 @@ const showEditor = () => {
   quill.focus()
 }
 
+loadDefaultScreen = () => {
+  store.get(['defaultScreen'], (settings) => {
+    const preset = {
+      defaultScreen: localStorage.getItem('defaultScreen') || 'default',
+      ...settings
+    }
+    if (preset.defaultScreen === 'writing') {
+      $('#editor-container').classList.remove('hidden')
+      quill.focus()
+    }
+    if (preset.defaultScreen === 'default') {
+      hideEditor()
+    }
+  })
+}
+
 const hideEditor = () => {
   quill.blur()
   $('#editor-container').classList.add('hidden')
@@ -59,17 +75,19 @@ const setupSettingsDialog = () => {
   const devicesInput = $('#settings-devices-input')
   const cssTextarea = $('#settings-css-textarea')
   const doneButton = $('#settings-done-button')
+  const defaultScreenInput = $('#settings-default-screen-input')
 
   // keyboard shortcut overrides
   const writingModeShortcutInput = $('#settings-writing-mode-shortcut-input')
 
-  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'battery', 'connection', 'devices'], (settings) => {
+  store.get(['theme', 'mode', 'css', 'favicons', 'timeformat', 'defaultScreen', 'battery', 'connection', 'devices'], (settings) => {
     let preset = {
       mode: localStorage.getItem('mode') || 'system',
       theme: localStorage.getItem('theme') || 'smooth-dark',
       css: localStorage.getItem('css') || '',
       favicons: localStorage.getItem('favicons') || 'hide',
       timeformat: localStorage.getItem('timeformat') || '12',
+      defaultScreen: localStorage.getItem('defaultScreen') || 'default',
       battery: localStorage.getItem('battery') || 'show',
       connection: localStorage.getItem('connection') || 'show',
       devices: localStorage.getItem('devices') || 'show',
@@ -153,6 +171,12 @@ const setupSettingsDialog = () => {
     })
   })
 
+  defaultScreenInput.addEventListener('change', (ev) => {
+    store.set({ defaultScreen: ev.target.value }, () => {
+      localStorage.setItem('defaultScreen', ev.target.value)
+    })
+  })
+
   batteryInput.addEventListener('change', (ev) => {
     store.set({ battery: ev.target.checked ? 'show' : 'hide' }, () => {
       localStorage.setItem('battery', ev.target.checked ? 'show' : 'hide')
@@ -174,6 +198,7 @@ const setupSettingsDialog = () => {
 
   doneButton.addEventListener('click', () => {
     $('.overlay').classList.add('hidden')
+    loadDefaultScreen()
     $('#settings-dialog').classList.add('hidden')
     $('#settings-dialog').classList.remove('animate')
   })
@@ -489,6 +514,7 @@ refreshDate()
 loadBookmarks()
 loadSyncedTabs()
 setupSettingsDialog()
+loadDefaultScreen()
 
 // refresh the clock
 setInterval(refreshDate, 1000)

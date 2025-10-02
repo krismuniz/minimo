@@ -1,0 +1,16 @@
+# Third-party libraries
+src/libraries/
+*.min.js
+
+# Dependencies
+node_modules/
+
+# Git
+.git/
+
+# Build artifacts
+dist/
+build/
+
+# OS files
+.DS_Store

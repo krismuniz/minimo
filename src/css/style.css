@@ -6,8 +6,9 @@
   --favicons-display: none;
 }
 
-.mode-system.prefers-dark:root, .mode-dark:root {
-  --menu-background: #3C4149;
+.mode-system.prefers-dark:root,
+.mode-dark:root {
+  --menu-background: #3c4149;
   --menu-color: white;
 
   --divider-color: #2b3035;
@@ -24,8 +25,9 @@
   --focus-color: #2a80f0;
 }
 
-.mode-system.prefers-light:root, .mode-light:root {
-  --menu-background: #FFFFFF;
+.mode-system.prefers-light:root,
+.mode-light:root {
+  --menu-background: #ffffff;
   --menu-color: #24292e;
 
   --divider-color: #eeeeee;
@@ -38,7 +40,7 @@
 
   --input-background: #eeeeee;
   --input-color: #24292e;
-  
+
   --focus-color: #1a73e8;
 }
 
@@ -59,36 +61,36 @@
 }
 
 .theme-material-red:root {
-  --background-color: #F44336;
-  --text-color: #FFFFFF;
+  --background-color: #f44336;
+  --text-color: #ffffff;
 }
 
 .theme-material-blue:root {
   --background-color: #3367d6;
-  --text-color: #FFFFFF;
+  --text-color: #ffffff;
 }
 
 .theme-forrest-green:root {
-  --background-color: #8BC34A;
+  --background-color: #8bc34a;
   --text-color: #1b5e19;
   --text-weight: 300;
 }
 
 .theme-savage-pink:root {
-  --background-color: #E91E63;
+  --background-color: #e91e63;
   --text-color: #ffffff;
   --text-weight: 300;
 }
 
 .theme-bumblebee:root {
-  --background-color: #FFEB3B;
+  --background-color: #ffeb3b;
   --text-color: #000000;
   --text-weight: 300;
 }
 
 .theme-persian-green:root {
   --background-color: #009688;
-  --text-color: #EAF1F6;
+  --text-color: #eaf1f6;
 }
 
 :root {
@@ -121,7 +123,9 @@ body {
   background-size: cover;
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
   user-select: none;
   overflow: hidden;
   height: 100vh;
@@ -166,7 +170,7 @@ a:not(.button):not(.url):visited {
 .favicon {
   width: 24px;
   height: 24px;
-  margin-right: 0.500rem;
+  margin-right: 0.5rem;
   display: var(--favicons-display);
   background: white;
   border-radius: 1rem;
@@ -184,7 +188,7 @@ a:not(.button):not(.url):visited {
 .link .favicon {
   width: 18px;
   height: 18px;
-  margin-right: 0.250rem;
+  margin-right: 0.25rem;
   vertical-align: text-up;
 }
 
@@ -211,7 +215,8 @@ a:not(.button):not(.url):visited {
   font-weight: 100;
 }
 
-.status, .special-message {
+.status,
+.special-message {
   display: block;
   font-size: 1rem;
   font-weight: 100;
@@ -234,7 +239,7 @@ a:not(.button):not(.url):visited {
 }
 
 .bookmarks-box {
-  font-size: 1.250rem;
+  font-size: 1.25rem;
   font-weight: var(--text-weight, 200);
   letter-spacing: 1px;
   text-align: center;
@@ -265,14 +270,16 @@ a:not(.button):not(.url):visited {
 .link {
   vertical-align: middle;
   display: inline-block;
-  padding: 0.250rem 0.500rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 1rem;
   margin: 0.5rem;
   -webkit-user-drag: element;
   font-weight: 400;
   font-size: 1rem;
   will-change: background-color, color;
-  transition: 100ms ease-in-out background-color, 100ms ease-in-out color;
+  transition:
+    100ms ease-in-out background-color,
+    100ms ease-in-out color;
   cursor: pointer;
 }
 
@@ -417,8 +424,8 @@ a:not(.button):not(.url):visited {
   background-color: var(--menu-background);
   color: var(--menu-color);
   border-radius: 0.5rem;
-  padding: 1.250rem;
-  font-size: 0.850rem;
+  padding: 1.25rem;
+  font-size: 0.85rem;
   will-change: width, height;
 }
 
@@ -451,7 +458,7 @@ a:not(.button):not(.url):visited {
 .overlay {
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   position: fixed;
   z-index: 999;
   display: flex;
@@ -498,7 +505,9 @@ a:not(.button):not(.url):visited {
   color: #ff8d5e;
 }
 
-.input-container input:not([type="checkbox"]), .input-container select, .input-container textarea {
+.input-container input:not([type='checkbox']),
+.input-container select,
+.input-container textarea {
   font-weight: 300;
   font-size: 1rem;
   -webkit-appearance: none;
@@ -508,8 +517,8 @@ a:not(.button):not(.url):visited {
   text-align: inherit;
   text-overflow: ellipsis;
   width: 100%;
-  -webkit-padding-end: 0.750rem;
-  -webkit-padding-start: 0.750rem;
+  -webkit-padding-end: 0.75rem;
+  -webkit-padding-start: 0.75rem;
   padding-bottom: 0.5rem;
   padding-top: 0.5rem;
   border-radius: 0.375rem;
@@ -532,7 +541,9 @@ a:not(.button):not(.url):visited {
   font-family: monospace;
 }
 
-.input-container input:not([type="checkbox"]):focus, .input-container select:focus, .input-container textarea:focus {
+.input-container input:not([type='checkbox']):focus,
+.input-container select:focus,
+.input-container textarea:focus {
   color: var(--input-color);
   box-shadow: 0 0 0 2px var(--focus-color);
 }
@@ -631,7 +642,7 @@ summary {
 @keyframes land {
   from {
     opacity: 0;
-    transform: scale3d(1.10, 1.10, 1);
+    transform: scale3d(1.1, 1.1, 1);
   }
 
   50% {

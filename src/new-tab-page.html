@@ -1,174 +1,223 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>New Tab</title>
+    <link rel="stylesheet" type="text/css" href="./css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="./css/quill.bubble.css" />
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>New Tab</title>
-  <link rel="stylesheet" type="text/css" href="./css/normalize.css">
-  <link rel="stylesheet" type="text/css" href="./css/quill.bubble.css">
-  <link rel="stylesheet" type="text/css" href="./css/style.css">
-</head>
-
-<body>
-  <script src="./libraries/dom.js"></script>
-  <script src="./load-theme.js"></script>
-  <script src="./libraries/Sortable.min.js"></script>
-  <script src="./libraries/quill.min.js"></script>
-  <script src="./libraries/modikeys.js"></script>
-  <script src="./libraries/debounce.js"></script>
-  <script src="./libraries/timezones.js"></script>
-  <!-- libraries that depend on the DOM being loaded -->
-  <script defer src="index.js"></script>
-  <div id="welcome-dialog" class="dialog corner hidden">
-    <div id="welcome-dialog-title" class="dialog-title">👋 Welcome to Minimo!</div>
-    <p class="dialog-body">Right-click the page or a shortcut to see contextual options to customize your new tab page
-      or toggle writing mode. </p>
-    <p class="dialog-body">If you like Minimo, don't forget to leave a review later!</p>
-    <div class="button-group no-margin">
-      <a id="welcome-help-button" class="button" target="_blank"
-        href="https://github.com/krismuniz/minimo/#usage-guide">Help</a>
-      <button id="welcome-done-button" class="button primary">Got It</button>
-    </div>
-  </div>
-  <div id="editor-container" class="hidden">
-    <div id="editor"></div>
-  </div>
-  <style id="custom-style"></style>
-  <div class="overlay hidden">
-    <div id="shortcut-dialog" class="dialog hidden">
-      <div id="shortcut-dialog-title" class="dialog-title">Edit shortcut</div>
-      <div class="input-container">
-        <label for="shortcut-name-input">Name</label>
-        <input id="shortcut-name-input" placeholder='e.g. "Google", "Work Mail", etc.' type="text" autofocus
-          tabindex="1" aria-label="Name" data-context-menu="default">
-        <span id="shortcut-name-feedback"></span>
-      </div>
-      <div class="input-container">
-        <label for="shortcut-url-input">URL</label>
-        <input id="shortcut-url-input" placeholder='e.g. "https://example.com"' type="url" tabindex="2" aria-label="URL"
-          data-context-menu="default">
-        <span id="shortcut-url-feedback"></span>
-      </div>
-      <div class="button-group">
-        <button id="shortcut-cancel-button" class="button">Cancel</button>
-        <button id="shortcut-save-button" class="button primary">Save</button>
-      </div>
-    </div>
-    <div id="tz-dialog" class="dialog hidden">
-      <div id="tz-dialog-title" class="dialog-title">Add a time zone clock</div>
-      <div class="input-container">
-        <label for="tz-name-input">Friendly Name</label>
-        <input id="tz-name-input" maxlength="16" type="text" autofocus tabindex="1" aria-label="Friendly Time Zone Name"
-          data-context-menu="default" placeholder='e.g. "Los Angeles", "Home", etc'>
-        <span id="tz-name-feedback"></span>
-      </div>
-      <div class="input-container">
-        <label for="tz-timezone-input">Time Zone</label>
-        <input id="tz-timezone-input" list="tz-timezone-list" type="text" autofocus tabindex="1"
-          aria-label="Time Zone Name" data-context-menu="default" placeholder='e.g. "America / Los Angeles"'>
-        <datalist id="tz-timezone-list"></datalist>
-        <span id="tz-timezone-feedback"></span>
-      </div>
-      <p class="info" style="max-width: 25rem;">Time zones are still in <em>beta</em>. <a class="url"
-          href="https://github.com/krismuniz/minimo/issues/new/choose">Let us know</a> how we can improve this feature.
+  <body>
+    <!-- Third-party libraries -->
+    <script src="./libraries/Sortable.min.js"></script>
+    <script src="./libraries/quill.min.js"></script>
+    <script src="./libraries/modikeys.js"></script>
+    <script src="./libraries/timezones.js"></script>
+    <!-- Main app entry point (ES module) -->
+    <script type="module" src="index.js"></script>
+    <div id="welcome-dialog" class="dialog corner hidden">
+      <div id="welcome-dialog-title" class="dialog-title">👋 Welcome to Minimo!</div>
+      <p class="dialog-body">
+        Right-click the page or a shortcut to see contextual options to customize your new tab page
+        or toggle writing mode.
       </p>
-      <div class="button-group">
-        <button id="tz-cancel-button" class="button">Cancel</button>
-        <button id="tz-save-button" class="button primary">Save</button>
+      <p class="dialog-body">If you like Minimo, don't forget to leave a review later!</p>
+      <div class="button-group no-margin">
+        <a
+          id="welcome-help-button"
+          class="button"
+          target="_blank"
+          href="https://github.com/krismuniz/minimo/#usage-guide"
+          >Help</a
+        >
+        <button id="welcome-done-button" class="button primary">Got It</button>
       </div>
     </div>
-    <div id="settings-dialog" class="dialog hidden">
-      <div id="settings-dialog-id" class="dialog-title">Appearance</div>
-      <div class="input-container">
-        <label for="settings-mode-input">Mode</label>
-        <select id="settings-mode-input">
-          <option value="system">System Default</option>
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
-      </div>
-      <div class="input-container">
-        <label for="settings-theme-input">Theme</label>
-        <select id="settings-theme-input" data-context-menu="default">
-          <option value="smooth-dark">Smooth Dark</option>
-          <option value="pure-light">Pure Light</option>
-          <option value="deep-black">Deep Black</option>
-          <option disabled>-</option>
-          <option value="forrest-green">Forrest Green</option>
-          <option value="material-red">Material Red</option>
-          <option value="material-blue">Material Blue</option>
-          <option value="savage-pink">Savage Pink</option>
-          <option value="bumblebee">Bumblebee</option>
-          <option value="persian-green">Persian Green</option>
-        </select>
-      </div>
-      <div class="input-container-grid">
+    <div id="editor-container" class="hidden">
+      <div id="editor"></div>
+    </div>
+    <style id="custom-style"></style>
+    <div class="overlay hidden">
+      <div id="shortcut-dialog" class="dialog hidden">
+        <div id="shortcut-dialog-title" class="dialog-title">Edit shortcut</div>
         <div class="input-container">
-          <input id="settings-devices-input" type="checkbox" />
-          <label class="inline" for="settings-devices-input">Show Remote Tabs</label>
+          <label for="shortcut-name-input">Name</label>
+          <input
+            id="shortcut-name-input"
+            placeholder='e.g. "Google", "Work Mail", etc.'
+            type="text"
+            autofocus
+            tabindex="1"
+            aria-label="Name"
+            data-context-menu="default"
+          />
+          <span id="shortcut-name-feedback"></span>
         </div>
         <div class="input-container">
-          <input id="settings-favicons-input" type="checkbox" />
-          <label class="inline" for="settings-favicons-input">Show Favicons</label>
+          <label for="shortcut-url-input">URL</label>
+          <input
+            id="shortcut-url-input"
+            placeholder='e.g. "https://example.com"'
+            type="url"
+            tabindex="2"
+            aria-label="URL"
+            data-context-menu="default"
+          />
+          <span id="shortcut-url-feedback"></span>
         </div>
-        <div class="input-container">
-          <input id="settings-connection-input" type="checkbox" />
-          <label class="inline" for="settings-connection-input">Show Connection Status</label>
-        </div>
-        <div class="input-container">
-          <input id="settings-battery-input" type="checkbox" />
-          <label class="inline" for="settings-battery-input">Show Battery</label>
+        <div class="button-group">
+          <button id="shortcut-cancel-button" class="button">Cancel</button>
+          <button id="shortcut-save-button" class="button primary">Save</button>
         </div>
       </div>
-      <div class="menu-divider" style="margin-bottom: 1rem;"></div>
-      <details>
-        <summary>Advanced Settings</summary>
+      <div id="tz-dialog" class="dialog hidden">
+        <div id="tz-dialog-title" class="dialog-title">Add a time zone clock</div>
         <div class="input-container">
-          <label for="settings-timeformat-input">Time format</label>
-          <select id="settings-timeformat-input">
-            <option value="12">12h</option>
-            <option value="24">24h</option>
+          <label for="tz-name-input">Friendly Name</label>
+          <input
+            id="tz-name-input"
+            maxlength="16"
+            type="text"
+            autofocus
+            tabindex="1"
+            aria-label="Friendly Time Zone Name"
+            data-context-menu="default"
+            placeholder='e.g. "Los Angeles", "Home", etc'
+          />
+          <span id="tz-name-feedback"></span>
+        </div>
+        <div class="input-container">
+          <label for="tz-timezone-input">Time Zone</label>
+          <input
+            id="tz-timezone-input"
+            list="tz-timezone-list"
+            type="text"
+            autofocus
+            tabindex="1"
+            aria-label="Time Zone Name"
+            data-context-menu="default"
+            placeholder='e.g. "America / Los Angeles"'
+          />
+          <datalist id="tz-timezone-list"></datalist>
+          <span id="tz-timezone-feedback"></span>
+        </div>
+        <p class="info" style="max-width: 25rem">
+          Time zones are still in <em>beta</em>.
+          <a class="url" href="https://github.com/krismuniz/minimo/issues/new/choose"
+            >Let us know</a
+          >
+          how we can improve this feature.
+        </p>
+        <div class="button-group">
+          <button id="tz-cancel-button" class="button">Cancel</button>
+          <button id="tz-save-button" class="button primary">Save</button>
+        </div>
+      </div>
+      <div id="settings-dialog" class="dialog hidden">
+        <div id="settings-dialog-id" class="dialog-title">Appearance</div>
+        <div class="input-container">
+          <label for="settings-mode-input">Mode</label>
+          <select id="settings-mode-input">
+            <option value="system">System Default</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
           </select>
         </div>
         <div class="input-container">
-          <label for="settings-writing-mode-shortcut-input">Writing Mode Keyboard Shortcut</label>
-          <input id="settings-writing-mode-shortcut-input" data-shortcut-listener="true" type="text" />
-          <span id="settings-writing-mode-shortcut-info" class="info">Type in a key combination that will toggle writing
-            mode.</span>
-          <span id="settings-writing-mode-shortcut-info-2" class="info">It must include a modifier key (alt, shift,
-            control, etc.)</span>
+          <label for="settings-theme-input">Theme</label>
+          <select id="settings-theme-input" data-context-menu="default">
+            <option value="smooth-dark">Smooth Dark</option>
+            <option value="pure-light">Pure Light</option>
+            <option value="deep-black">Deep Black</option>
+            <option disabled>-</option>
+            <option value="forrest-green">Forrest Green</option>
+            <option value="material-red">Material Red</option>
+            <option value="material-blue">Material Blue</option>
+            <option value="savage-pink">Savage Pink</option>
+            <option value="bumblebee">Bumblebee</option>
+            <option value="persian-green">Persian Green</option>
+          </select>
         </div>
-        <div class="input-container">
-          <label for="settings-css-textarea">Custom CSS</label>
-          <textarea id="settings-css-textarea" tabindex="2" aria-label="CSS" data-context-menu="default"></textarea>
-          <span id="settings-css-info" class="info">Tweaking this might yield unexpected results.</span>
+        <div class="input-container-grid">
+          <div class="input-container">
+            <input id="settings-devices-input" type="checkbox" />
+            <label class="inline" for="settings-devices-input">Show Remote Tabs</label>
+          </div>
+          <div class="input-container">
+            <input id="settings-favicons-input" type="checkbox" />
+            <label class="inline" for="settings-favicons-input">Show Favicons</label>
+          </div>
+          <div class="input-container">
+            <input id="settings-connection-input" type="checkbox" />
+            <label class="inline" for="settings-connection-input">Show Connection Status</label>
+          </div>
+          <div class="input-container">
+            <input id="settings-battery-input" type="checkbox" />
+            <label class="inline" for="settings-battery-input">Show Battery</label>
+          </div>
         </div>
-      </details>
-      <div class="button-group">
-        <button id="settings-done-button" class="button primary">Done</button>
+        <div class="menu-divider" style="margin-bottom: 1rem"></div>
+        <details>
+          <summary>Advanced Settings</summary>
+          <div class="input-container">
+            <label for="settings-timeformat-input">Time format</label>
+            <select id="settings-timeformat-input">
+              <option value="12">12h</option>
+              <option value="24">24h</option>
+            </select>
+          </div>
+          <div class="input-container">
+            <label for="settings-writing-mode-shortcut-input">Writing Mode Keyboard Shortcut</label>
+            <input
+              id="settings-writing-mode-shortcut-input"
+              data-shortcut-listener="true"
+              type="text"
+            />
+            <span id="settings-writing-mode-shortcut-info" class="info"
+              >Type in a key combination that will toggle writing mode.</span
+            >
+            <span id="settings-writing-mode-shortcut-info-2" class="info"
+              >It must include a modifier key (alt, shift, control, etc.)</span
+            >
+          </div>
+          <div class="input-container">
+            <label for="settings-css-textarea">Custom CSS</label>
+            <textarea
+              id="settings-css-textarea"
+              tabindex="2"
+              aria-label="CSS"
+              data-context-menu="default"
+            ></textarea>
+            <span id="settings-css-info" class="info"
+              >Tweaking this might yield unexpected results.</span
+            >
+          </div>
+        </details>
+        <div class="button-group">
+          <button id="settings-done-button" class="button primary">Done</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="menus">
-    <div class="menu hidden">
-      <ul class="menu-options"></ul>
+    <div class="menus">
+      <div class="menu hidden">
+        <ul class="menu-options"></ul>
+      </div>
     </div>
-  </div>
-  <div class="layout">
-    <div class="bookmarks-box"></div>
-    <div class="time-box">
-      <span class="time"></span>
-      <span class="date"></span>
-      <span class="status"></span>
-      <span class="special-message hidden"></span>
+    <div class="layout">
+      <div class="bookmarks-box"></div>
+      <div class="time-box">
+        <span class="time"></span>
+        <span class="date"></span>
+        <span class="status"></span>
+        <span class="special-message hidden"></span>
+      </div>
+      <div id="tz-box"></div>
+      <div class="devices-box">
+        <div class="tabs"></div>
+      </div>
     </div>
-    <div id="tz-box"></div>
-    <div class="devices-box">
-      <div class="tabs"></div>
-    </div>
-  </div>
-</body>
-
+  </body>
 </html>

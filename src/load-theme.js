@@ -1,10 +1,14 @@
 const setTheme = (theme) => {
-  $('html').className = Array.from($('html').classList).filter(c => !c.startsWith('theme-')).join(' ')
+  $('html').className = Array.from($('html').classList)
+    .filter((c) => !c.startsWith('theme-'))
+    .join(' ')
   $('html').classList.add('theme-' + theme)
 }
 
 const setMode = (mode) => {
-  $('html').className = Array.from($('html').classList).filter(c => !c.startsWith('mode-')).join(' ')
+  $('html').className = Array.from($('html').classList)
+    .filter((c) => !c.startsWith('mode-'))
+    .join(' ')
   $('html').classList.add('mode-' + mode)
 
   if ($('summary')) {
@@ -15,12 +19,16 @@ const setMode = (mode) => {
 }
 
 const setFavicons = (state) => {
-  $('html').className = Array.from($('html').classList).filter(c => !c.startsWith('favicons-')).join(' ')
+  $('html').className = Array.from($('html').classList)
+    .filter((c) => !c.startsWith('favicons-'))
+    .join(' ')
   $('html').classList.add('favicons-' + state)
 }
 
 const setPrefers = (mode) => {
-  $('html').className = Array.from($('html').classList).filter(c => !c.startsWith('prefers-')).join(' ')
+  $('html').className = Array.from($('html').classList)
+    .filter((c) => !c.startsWith('prefers-'))
+    .join(' ')
   $('html').classList.add('prefers-' + mode)
 }
 
@@ -49,38 +57,41 @@ const loadAppearance = () => {
 
   setAppearance({ mode, theme, favicons, timeformat, battery, css })
 
-  chrome.storage.sync.get(['theme', 'mode', 'favicons', 'timeformat', 'battery', 'css'], (settings) => {
-    let preset = {
-      mode,
-      theme,
-      favicons,
-      timeformat,
-      battery,
-      css,
-      ...settings
+  chrome.storage.sync.get(
+    ['theme', 'mode', 'favicons', 'timeformat', 'battery', 'css'],
+    (settings) => {
+      let preset = {
+        mode,
+        theme,
+        favicons,
+        timeformat,
+        battery,
+        css,
+        ...settings
+      }
+
+      localStorage.setItem('mode', preset.mode)
+      localStorage.setItem('theme', preset.theme)
+      localStorage.setItem('favicons', preset.favicons)
+      localStorage.setItem('timeformat', preset.timeformat)
+      localStorage.setItem('battery', preset.battery)
+      localStorage.setItem('css', preset.css)
+
+      setAppearance({
+        mode: preset.mode,
+        theme: preset.theme,
+        favicons: preset.favicons,
+        timeformat: preset.timeformat,
+        battery: preset.battery,
+        css: preset.css
+      })
     }
-
-    localStorage.setItem('mode', preset.mode)
-    localStorage.setItem('theme', preset.theme)
-    localStorage.setItem('favicons', preset.favicons)
-    localStorage.setItem('timeformat', preset.timeformat)
-    localStorage.setItem('battery', preset.battery)
-    localStorage.setItem('css', preset.css)
-
-    setAppearance({
-      mode: preset.mode,
-      theme: preset.theme,
-      favicons: preset.favicons,
-      timeformat: preset.timeformat,
-      battery: preset.battery,
-      css: preset.css
-    })
-  })
+  )
 }
 
 // get preferred color from system
 // AND set an event listener to detect changes
-(function () {
+;(function () {
   let darkQuery = window.matchMedia('(prefers-color-scheme: dark)')
   darkQuery.addEventListener('change', function (event) {
     setPrefers(event.matches ? 'dark' : 'light')

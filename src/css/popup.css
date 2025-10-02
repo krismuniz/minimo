@@ -1,20 +1,22 @@
 :root {
   min-width: 224px;
   user-select: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
   background-color: var(--background-color, #fff);
 }
 
 .divider {
   height: 1px;
-  background: var(--divider-background-color, rgba(0,0,0,0.1));
-  margin: 0.250rem 0;
+  background: var(--divider-background-color, rgba(0, 0, 0, 0.1));
+  margin: 0.25rem 0;
 }
 
 .action {
   color: var(--color, #000);
-  padding: 0.500rem 1rem;
-  font-size: 0.750rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
   line-height: 1.2;
   display: block;
   text-decoration: none;
@@ -39,7 +41,7 @@
 }
 
 .action:hover {
-  background-color: var(--action-hover-color, rgba(0,0,0,0.05));
+  background-color: var(--action-hover-color, rgba(0, 0, 0, 0.05));
 }
 
 .action:active {
@@ -61,11 +63,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #292A2D;
+    --background-color: #292a2d;
     --color: #fff;
     --action-hover-color: rgba(255, 255, 255, 0.05);
     --action-active-color: rgba(255, 255, 255, 0.1);
     --divider-background-color: rgba(255, 255, 255, 0.1);
   }
 }
-
